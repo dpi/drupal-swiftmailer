@@ -40,8 +40,8 @@ class SWIFTMailSystem implements MailSystemInterface {
 
         if (variable_get('swiftmailer_convert_mode', SWIFTMAILER_VARIABLE_CONVERT_MODE_DEFAULT) ||
             !empty($message['params']['convert'])) {
-          $converter = new html2text($message['body']);
-          $message['plain'] = $converter->get_text();
+          $converter = new Html2Text($message['body']);
+          $message['plain'] = $converter->getText();
         }
       }
 
