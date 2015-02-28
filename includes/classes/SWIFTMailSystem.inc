@@ -465,7 +465,7 @@ class SWIFTMailSystem implements MailSystemInterface {
         $applicable_charset = trim(substr($matches[0], 0, -1));
         $applicable_charset = preg_replace('/charset=/', '', $applicable_charset);
       } else {
-        $applicable_charset = $default_format;
+        $applicable_charset = $default_charset;
       }
       
     }
