@@ -400,7 +400,7 @@ class SWIFTMailSystem implements MailSystemInterface {
         // The provided 'cid' needs to be replaced with the 'cid' returned
         // by the Swift Mailer library.
         $body = $m->getBody();
-        $body = preg_replace('/cid.*' . $image->cid . '/', $cid, $body);
+        $body = preg_replace('/cid:' . $image->cid . '/', $cid, $body);
         $m->setBody($body);
       }
     }
