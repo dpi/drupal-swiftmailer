@@ -5,13 +5,6 @@
  */
 
 /**
- * Default page.
- */
-function swiftmailer_admin_transport_page() {
-  return drupal_get_form('swiftmailer_admin_transport_form');
-}
-
-/**
  * Form builder; the transport form.
  *
  * @see swiftmailer_admin_transport_form_ajax()

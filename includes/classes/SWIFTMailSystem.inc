@@ -28,7 +28,7 @@ class SWIFTMailSystem implements MailSystemInterface {
 
       // Get applicable format.
       $applicable_format = $this->getApplicableFormat($message);
-      
+
       // Theme message if format is set to be HTML.
       if ($applicable_format == SWIFTMAILER_FORMAT_HTML) {
         if (isset($message['params']['theme'])) {
@@ -40,8 +40,18 @@ class SWIFTMailSystem implements MailSystemInterface {
 
         if (variable_get('swiftmailer_convert_mode', SWIFTMAILER_VARIABLE_CONVERT_MODE_DEFAULT) ||
             !empty($message['params']['convert'])) {
-          $converter = new Html2Text($message['body']);
-          $message['plain'] = $converter->getText();
+
+          switch (variable_get('swiftmailer_convert_library')) {
+            case SWIFTMAILER_VARIABLE_CONVERT_LIBRARY_MAILSYSTEM:
+              $message['plain'] = mailsystem_html_to_text($message['body']);
+              break;
+
+            case SWIFTMAILER_VARIABLE_CONVERT_LIBRARY_DEFAULT:
+            default:
+              $converter = new Html2Text($message['body']);
+              $message['plain'] = $converter->getText();
+              break;
+          }
         }
       }
 
@@ -54,11 +64,11 @@ class SWIFTMailSystem implements MailSystemInterface {
       preg_match_all('/"image:([^"]+)"/', $message['body'], $embeddable_images);
       for ($i = 0; $i < count($embeddable_images[0]); $i++) {
         $image_id = $embeddable_images[0][$i];
-        
+
         if (isset($processed_images[$image_id])) {
           continue;
         }
-        
+
         $image_path = trim($embeddable_images[1][$i]);
         $image_name = basename($image_path);
 
@@ -191,7 +201,7 @@ class SWIFTMailSystem implements MailSystemInterface {
 
       // Get applicable format.
       $applicable_format = $this->getApplicableFormat($message);
-      
+
       // Get applicable character set.
       $applicable_charset = $this->getApplicableCharset($message);
 
@@ -203,7 +213,7 @@ class SWIFTMailSystem implements MailSystemInterface {
       if ($applicable_format == SWIFTMAILER_FORMAT_HTML && !empty($message['plain'])) {
         $m->addPart($message['plain'], SWIFTMAILER_FORMAT_PLAIN, $applicable_charset);
       }
-      
+
       // Validate that $message['params']['files'] is an array.
       if (empty($message['params']['files']) || !is_array($message['params']['files'])) {
         $message['params']['files'] = array();
@@ -338,7 +348,7 @@ class SWIFTMailSystem implements MailSystemInterface {
         else {
           $content = file_get_contents(drupal_realpath($file->uri));
         }
-        
+
         $filename = $file->filename;
         $filemime = $file->filemime;
 
@@ -380,7 +390,7 @@ class SWIFTMailSystem implements MailSystemInterface {
         else {
           $content = file_get_contents(drupal_realpath($image->uri));
         }
-        
+
         $filename = $image->filename;
         $filemime = $image->filemime;
 
@@ -425,7 +435,7 @@ class SWIFTMailSystem implements MailSystemInterface {
     if ($respect_format && !empty($message['headers']['Content-Type'])) {
       $format = $message['headers']['Content-Type'];
       $format = preg_match('/.*\;/U', $format, $matches);
-      
+
       if ($format > 0) {
         $applicable_format = trim(substr($matches[0], 0, -1));
       } else {
@@ -474,11 +484,11 @@ class SWIFTMailSystem implements MailSystemInterface {
       } else {
         $applicable_charset = $default_charset;
       }
-      
+
     }
 
     return $applicable_charset;
 
   }
-  
+
 }
