@@ -190,6 +190,18 @@ class SWIFTMailSystem implements MailSystemInterface {
       swiftmailer_remove_header($m, 'To');
       swiftmailer_remove_header($m, 'Subject');
 
+      if ($message['from'] == variable_get('site_mail', '')) {
+        $sender_name = variable_get('swiftmailer_sender_name', '');
+        if (empty($sender_name)) {
+          $sender_name = variable_get('site_name', 'Drupal');
+        }
+        $sender_email = variable_get('swiftmailer_sender_email', '');
+        if (empty($sender_email)) {
+          $sender_email = variable_get('site_mail', '');
+        }
+        $message['from'] = '"' . $sender_name . '" <' . $sender_email . '>';
+      }
+
       // Parse 'from' and 'to' mailboxes.
       $from = swiftmailer_parse_mailboxes($message['from']);
       $to = swiftmailer_parse_mailboxes($message['to']);
