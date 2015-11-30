@@ -125,7 +125,7 @@ class SWIFTMailSystem implements MailSystemInterface {
       $m = Swift_Message::newInstance();
 
       // Not all Drupal headers should be added to the e-mail message.
-      // Some headers must be supressed in order for Swift Mailer to
+      // Some headers must be suppressed in order for Swift Mailer to
       // do its work properly.
       $suppressable_headers = swiftmailer_get_supressable_headers();
 
@@ -141,7 +141,7 @@ class SWIFTMailSystem implements MailSystemInterface {
         foreach ($message['headers'] as $header_key => $header_value) {
 
           // Check wether the current header key is empty or represents
-          // a header that should be supressed. If yes, then skip header.
+          // a header that should be suppressed. If yes, then skip header.
           if (empty($header_key) || in_array($header_key, $suppressable_headers)) {
             continue;
           }
