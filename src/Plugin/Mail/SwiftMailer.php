@@ -22,6 +22,7 @@ use Drupal\swiftmailer\Utility\Conversion;
 use Exception;
 use Html2Text\Html2Text;
 use Psr\Log\LoggerInterface;
+use stdClass;
 use Swift_Attachment;
 use Swift_FileSpool;
 use Swift_Image;
@@ -389,7 +390,7 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
     // Iterate through each array element.
     foreach ($files as $file) {
 
-      if ($file instanceof \stdClass) {
+      if ($file instanceof stdClass) {
 
         // Validate required fields.
         if (empty($file->uri) || empty($file->filename) || empty($file->filemime)) {
@@ -465,7 +466,7 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
     // Iterate through each array element.
     foreach ($images as $image) {
 
-      if ($image instanceof \stdClass) {
+      if ($image instanceof stdClass) {
 
         // Validate required fields.
         if (empty($image->uri) || empty($image->filename) || empty($image->filemime) || empty($image->cid)) {
