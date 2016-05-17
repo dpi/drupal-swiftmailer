@@ -75,8 +75,8 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    */
   function __construct(ImmutableConfig $transport, ImmutableConfig $message, LoggerInterface $logger, RendererInterface $renderer, ModuleHandlerInterface $module_handler) {
-    $this->config['transport'] = $transport->getRawData();
-    $this->config['message'] = $message->getRawData();
+    $this->config['transport'] = $transport->get();
+    $this->config['message'] = $message->get();
     $this->logger = $logger;
     $this->renderer = $renderer;
     $this->moduleHandler = $module_handler;
