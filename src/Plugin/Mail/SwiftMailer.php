@@ -146,10 +146,10 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
         $image_path = Unicode::substr($image_path, 1);
       }
 
-      $image = new stdClass();
+      $image = new \stdClass();
       $image->uri = $image_path;
       $image->filename = $image_name;
-      $image->filemime = file_get_mimetype($image_path);
+      $image->filemime = \Drupal::service('file.mime_type.guesser')->guess($image_path);
       $image->cid = rand(0, 9999999999);
       $message['params']['images'][] = $image;
       $message['body'] = preg_replace($image_id, 'cid:' . $image->cid, $message['body']);
