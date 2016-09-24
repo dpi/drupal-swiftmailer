@@ -371,8 +371,8 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
       $this->logger->error(
         'An attempt to send an e-mail message failed, and the following error
         message was returned : @exception_message<br /><br />The e-mail carried
-        the following headers:<br /><br />!headers',
-        array('@exception_message' => $e->getMessage(), '!headers' => $headers));
+        the following headers:<br /><br />@headers',
+        array('@exception_message' => $e->getMessage(), '@headers' => $headers));
       drupal_set_message(t('An attempt to send an e-mail message failed.'), 'error');
     }
   }
