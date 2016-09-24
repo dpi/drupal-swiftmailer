@@ -62,24 +62,24 @@ you need to use when interacting with the theming system is 'swiftmailer'.
 
 2.1 Theme File
 
-The easiest way to theme e-mails is to create a file named 'swiftmailer.tpl.php'
-in your theme folder. Please see section 2.1.1 for an overview of the variables
-you can use in the 'swiftmailer.tpl.php' file. The theme file should hold markup
-which wraps the actual content of the message. The below block of code
-demonstrates what a 'swiftmailer.tpl.php' might look like.
+The easiest way to theme e-mails is to create a file named
+'swiftmailer.html.twig' in your theme folder. Please see section 2.1.1 for an
+overview of the variables you can use in the 'swiftmailer.html.twig' file. The
+theme file should hold markup which wraps the actual content of the message. The
+below block of code demonstrates what a 'swiftmailer.html.twig' might look like.
 
--- start of 'swiftmailer.tpl.php' --
+-- start of 'swiftmailer.html.twig' --
 
 <div>
-    <?php print $body; ?>
+ {{ body }}
 </div>
 
--- end of 'swiftmailer.tpl.php' --
+-- end of 'swiftmailer.html.twig' --
 
 2.1.1 Theme File Variables
 
 This section is an overview of the basic variables that are available within
-the theme file 'swiftmailer.tpl.php'. Additional variables might be added by
+the theme file 'swiftmailer.html.twig'. Additional variables might be added by
 Drupal or other modules.
 
 $key
@@ -99,19 +99,19 @@ $subject
 $body
   The actual content.
 
-Tip! You can make even more variables available in 'swiftmailer.tpl.php' if you
-     implement your own preprocess function. If you would like to make more
+Tip! You can make even more variables available in 'swiftmailer.html.twig' if
+     you implement your own preprocess function. If you would like to make more
      variables available from a module you control, then you simply just need to
      implement the following preprocess function:
 
-     [yourmodule]_swiftmailer_preprocess(&$variables).
+     [yourmodule]_preprocess_swiftmailer(&$variables).
 
      Similarly, if you want to make more variables available from your theme,
      then all you need is to implement the following preprocess function:
 
-     [yourtheme]_swiftmailer_preprocess(&$variables). You can read more about
-     which preprocess and process functions that are available form the
-     'swiftmailer' hook in the Drupal 7 ocumentation for the function theme().
+     [yourtheme]_preprocess_swiftmailer(&$variables). You can read more about
+     which preprocess and process functions that are available from the
+     'swiftmailer' hook in the Drupal 8 documentation for the function theme().
 
 3.0 Attatchments, Inline Images and Advanced Usage
 
