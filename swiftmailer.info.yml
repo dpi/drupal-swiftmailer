@@ -3,3 +3,7 @@ type: module
 description: Installs Swift Mailer as a mail system.
 core: 8.x
 package: Mail
+dependencies:
+  - mailsystem
+test_dependencies:
+  - mailsystem

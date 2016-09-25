@@ -22,6 +22,7 @@ class SwiftMailerSettingsTest extends WebTestBase {
    */
   public static $modules = [
     'swiftmailer',
+    'mailsystem',
     'block',
   ];
 

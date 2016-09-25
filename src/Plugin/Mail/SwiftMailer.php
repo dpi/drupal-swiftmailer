@@ -360,9 +360,6 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
 
       // Send the message.
       return $mailer->send($m);
-
-
-
     }
     catch (Exception $e) {
 
