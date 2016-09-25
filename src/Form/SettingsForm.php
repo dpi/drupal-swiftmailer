@@ -48,7 +48,7 @@ class SettingsForm extends ConfigFormBase {
     // Display the currently configured transport type, or alternatively the
     // currently selected transport type if the user has chosen to configure
     // another transport type.
-    $transport = $config->get('transport', SWIFTMAILER_TRANSPORT_NATIVE);
+    $transport = $config->get('transport');
     $transport = ($form_state->hasValue(['transport', 'type'])) ? $form_state->getValue(['transport', 'type']) : $transport;
 
     $form['transport']['type'] = array(
@@ -66,7 +66,7 @@ class SettingsForm extends ConfigFormBase {
         'method' => 'replace',
         'effect' => 'fade',
       ),
-      '#description' => t('Not sure which transport type to choose? The @documentation gives you a good overview of the various transport types.', array('@documentation' => Link::fromTextAndUrl($this->t('Swift Mailer documentation'), Url::fromUri('http://swiftmailer.org/docs/sending.html#transport-types')))),
+      '#description' => t('Not sure which transport type to choose? The @documentation gives you a good overview of the various transport types.', array('@documentation' => Link::fromTextAndUrl((string) $this->t('Swift Mailer documentation'), Url::fromUri('http://swiftmailer.org/docs/sending.html#transport-types'))->toString())),
     );
 
     /*
@@ -98,7 +98,7 @@ class SettingsForm extends ConfigFormBase {
       server of your choice. You need to specify which SMTP server
       to use. Please refer to the @documentation for more details
       about this transport type.',
-          array('@documentation' => Link::fromTextAndUrl($this->t('Swift Mailer documentation'), Url::fromUri('http://swiftmailer.org/docs/sending.html#the-smtp-transport')))) . '</p>',
+          array('@documentation' => Link::fromTextAndUrl($this->t('Swift Mailer documentation'), Url::fromUri('http://swiftmailer.org/docs/sending.html#the-smtp-transport'))->toString())) . '</p>',
     );
 
     $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_SMTP]['server'] = array(
@@ -167,7 +167,7 @@ class SettingsForm extends ConfigFormBase {
       MTA. If you do not provide any path then Swift Mailer
       defaults to /usr/sbin/sendmail. You can read more about
       this transport type in the @documentation.',
-          array('@documentation' => Link::fromTextAndUrl($this->t('Swift Mailer documentation'), Url::fromUri('http://swiftmailer.org/docs/sending.html#the-sendmail-transport')))) . '</p>',
+          array('@documentation' => Link::fromTextAndUrl($this->t('Swift Mailer documentation'), Url::fromUri('http://swiftmailer.org/docs/sending.html#the-sendmail-transport'))->toString())) . '</p>',
     );
 
     $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_SENDMAIL]['path'] = array(
@@ -181,7 +181,7 @@ class SettingsForm extends ConfigFormBase {
       '#type' => 'radios',
       '#title' => t('Mode'),
       '#options' => array('bs' => 'bs', 't' => 't '),
-      '#description' => t('Not sure which option to choose? Go with <em>bs</em>. You can read more about the above two modes in the @documentation.', array('@documentation' => Link::fromTextAndUrl($this->t('Swift Mailer documentation'), Url::fromUri('http://swiftmailer.org/docs/sendmail-transport')))),
+      '#description' => t('Not sure which option to choose? Go with <em>bs</em>. You can read more about the above two modes in the @documentation.', array('@documentation' => Link::fromTextAndUrl($this->t('Swift Mailer documentation'), Url::fromUri('http://swiftmailer.org/docs/sendmail-transport'))->toString())),
       '#default_value' => $config->get('sendmail_mode'),
     );
 
@@ -200,7 +200,7 @@ class SettingsForm extends ConfigFormBase {
       configured here. Please refer to the @documentation if you
       would like to read more about how the built-in mail functionality
       in PHP can be configured.',
-          array('@documentation' => Link::fromTextAndUrl($this->t('PHP documentation'), Url::fromUri('http://www.php.net/manual/en/mail.configuration.php')))) . '</p>',
+          array('@documentation' => Link::fromTextAndUrl($this->t('PHP documentation'), Url::fromUri('http://www.php.net/manual/en/mail.configuration.php'))->toString())) . '</p>',
     );
 
     $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_SPOOL] = array(
@@ -218,11 +218,12 @@ class SettingsForm extends ConfigFormBase {
     read from the spool and take care of sending the emails.') . '</p>',
     );
 
+    $spool_directory = $config->get('spool_directory');
     $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_SPOOL]['directory'] = array(
       '#type' => 'textfield',
       '#title' => t('Spool directory'),
       '#description' => t('The absolute path to the spool directory.'),
-      '#default_value' => $config->get('spool_directory', sys_get_temp_dir() . '/swiftmailer-spool'),
+      '#default_value' => !empty($spool_directory) ? $spool_directory : sys_get_temp_dir() . '/swiftmailer-spool',
     );
 
     return $form;

@@ -43,13 +43,13 @@ class MessagesForm extends ConfigFormBase {
     $form['format']['type'] = array(
       '#type' => 'radios',
       '#options' => array(SWIFTMAILER_FORMAT_PLAIN => t('Plain Text'), SWIFTMAILER_FORMAT_HTML => t('HTML')),
-      '#default_value' => $config->get('format', SWIFTMAILER_VARIABLE_FORMAT_DEFAULT),
+      '#default_value' => $config->get('format')
     );
 
     $form['format']['respect'] = array(
       '#type' => 'checkbox',
       '#title' => t('Respect provided e-mail format.'),
-      '#default_value' => $config->get('respect_format', SWIFTMAILER_VARIABLE_RESPECT_FORMAT_DEFAULT),
+      '#default_value' => $config->get('respect_format'),
       '#description' => t('The header "Content-Type", if available, will be respected if you enable this setting.
         Settings such as e-mail format ("text/plain" or "text/html") and character set may be provided through this
         header. Unless your site somehow alters e-mails, enabling this setting will result in all e-mails to be sent
@@ -71,7 +71,7 @@ class MessagesForm extends ConfigFormBase {
     $form['convert']['mode'] = array(
       '#type' => 'checkbox',
       '#title' => t('Generate alternative plain text version.'),
-      '#default_value' => $config->get('convert_mode', SWIFTMAILER_VARIABLE_CONVERT_MODE_DEFAULT),
+      '#default_value' => $config->get('convert_mode'),
       '#description' => t('Please refer to @link for more details about how the alternative plain text version will be generated.', array('@link' => Link::fromTextAndUrl('html2text', Url::fromUri('http://www.chuggnutt.com/html2text')))),
     );
 
@@ -86,7 +86,7 @@ class MessagesForm extends ConfigFormBase {
     $form['character_set']['type'] = array(
       '#type' => 'select',
       '#options' => swiftmailer_get_character_set_options(),
-      '#default_value' => $config->get('character_set', SWIFTMAILER_VARIABLE_CHARACTER_SET_DEFAULT),
+      '#default_value' => $config->get('character_set'),
     );
 
 
