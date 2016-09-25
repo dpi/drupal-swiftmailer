@@ -510,7 +510,6 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
    *
    */
   private function getApplicableFormat($message) {
-
     // Get the configured default format.
     $default_format = $this->config['message']['format'];
 

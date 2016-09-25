@@ -16,3 +16,10 @@ function swiftmailer_requirements($phase) {
 
   return $requirements;
 }
+
+/**
+ * Implements hook_install().
+ */
+function swiftmailer_install() {
+  Drupal::configFactory()->getEditable('system.mail')->set('interface.swiftmailer', 'swiftmailer')->save();
+}

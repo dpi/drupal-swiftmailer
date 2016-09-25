@@ -15,3 +15,9 @@ swiftmailer.message_settings:
   route_name: swiftmailer.message_settings
   description: 'Configure how Swift Mailer will compose messages.'
   parent: swiftmailer.config
+
+swiftmailer.test:
+  title: 'Test'
+  route_name: swiftmailer.message_settings
+  description: 'Send a test e-mail to verify that the configuration works.'
+  parent: swiftmailer.config

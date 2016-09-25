@@ -21,3 +21,11 @@ swiftmailer.message_settings:
     _title: 'Message settings'
   requirements:
     _permission: 'administer swiftmailer'
+
+swiftmailer.test:
+  path: 'admin/config/people/swiftmailer/test'
+  defaults:
+    _form: '\Drupal\swiftmailer\Form\TestForm'
+    _title: Test
+  requirements:
+    _permission: 'administer swiftmailer'

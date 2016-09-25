@@ -4,6 +4,8 @@
  * This is the primary module file.
  */
 
+use Drupal\Core\Render\Markup;
+
 include_once __DIR__ . '/includes/helpers/utilities.inc';
 
 // Define permissions.
@@ -38,19 +40,16 @@ define('SWIFTMAILER_VARIABLE_CHARACTER_SET_DEFAULT', 'UTF-8');
  * Implements hook_mail().
  */
 function swiftmailer_mail($key, &$message) {
-
   $user = \Drupal::currentUser();
+  $message['headers']['Content-Type'] = SWIFTMAILER_FORMAT_HTML;
 
-  //$message['params']['format'] = SWIFTMAILER_FORMAT_HTML;
-
-  $text[] = '<h3>' . t('Dear !user,', array('!user' => $user->getUsername())) . '</h3>';
-  $text[] = '<p>' . t('This e-mail has been sent from !site by the Swift Mailer module. The module has been successfully configured.', array('!site' => variable_get('site_name', 'a Drupal site'))) . '</p>';
+  $text[] = '<h3>' . t('Dear @user,', array('@user' => $user->getDisplayName())) . '</h3>';
+  $text[] = '<p>' . t('This e-mail has been sent from @site by the Swift Mailer module. The module has been successfully configured.', array('@site' => \Drupal::config('system.site')->get('name'))) . '</p>';
   $text[] = t('Kind regards') . '<br /><br />';
   $text[] = t('The Swift Mailer module');
 
   $message['subject'] = t('Swift Mailer has been successfully configured!');
-  $message['body'] = $text;
-
+  $message['body'] = array_map(function ($text) { return Markup::create($text); }, $text);
 }
 
 /**
