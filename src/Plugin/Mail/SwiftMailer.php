@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\swiftmailer\Plugin\Mail\SwiftMailer.
- */
-
 namespace Drupal\swiftmailer\Plugin\Mail;
 
 use Drupal\Component\Render\MarkupInterface;

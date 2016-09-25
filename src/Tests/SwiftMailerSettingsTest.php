@@ -1,8 +1,4 @@
 <?php
-/**
- * @file
- * Contains \Drupal\swiftmailer\Tests\SwiftMailerSettingsTest.
- */
 
 namespace Drupal\swiftmailer\Tests;
 

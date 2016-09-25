@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\swiftmailer\Utility\Conversion.
- */
-
 namespace Drupal\swiftmailer\Utility;
 
 use Swift_Message;

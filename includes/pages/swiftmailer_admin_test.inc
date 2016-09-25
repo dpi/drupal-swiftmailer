@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * An administration page which allows for sending a test e-mail.

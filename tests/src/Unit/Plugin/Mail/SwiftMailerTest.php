@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\swiftmailer\Unit\Plugin\Mail\SwiftMailerTest
- */
-
 namespace Drupal\Tests\swiftmailer\Unit\Plugin\Mail;
 
 use Drupal\Component\Render\FormattableMarkup;

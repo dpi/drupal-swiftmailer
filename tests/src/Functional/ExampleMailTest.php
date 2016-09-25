@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\swiftmailer\Functional\ExampleMailTest.
- */
-
 namespace Drupal\Tests\swiftmailer\Functional;
 
 use Drupal\Core\Url;

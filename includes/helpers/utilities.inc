@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * This file contains general utility functions.

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\swiftmailer\Form\MessagesForm.
- */
-
 namespace Drupal\swiftmailer\Form;
 
 use Drupal\Core\Form\ConfigFormBase;
