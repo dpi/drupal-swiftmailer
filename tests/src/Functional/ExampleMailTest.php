@@ -10,6 +10,9 @@ namespace Drupal\Tests\swiftmailer\Functional;
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
 
+/**
+ * @group swiftmailer
+ */
 class ExampleMailTest extends BrowserTestBase {
 
   public static $modules = ['swiftmailer', 'mailsystem'];
