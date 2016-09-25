@@ -5,6 +5,7 @@
  * This is the primary module file.
  */
 
+use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Url;
 
@@ -51,7 +52,9 @@ function swiftmailer_mail($key, &$message) {
   $text[] = t('The Swift Mailer module');
 
   $message['subject'] = t('Swift Mailer has been successfully configured!');
-  $message['body'] = array_map(function ($text) { return Markup::create($text); }, $text);
+  $message['body'] = array_map(function ($text) {
+    return Markup::create($text);
+  }, $text);
 }
 
 /**
@@ -97,7 +100,7 @@ function template_preprocess_swiftmailer(&$variables) {
 /**
  * Implements hook_help().
  */
-function swiftmailer_help($route_name, \Drupal\Core\Routing\RouteMatchInterface $route_match) {
+function swiftmailer_help($route_name, RouteMatchInterface $route_match) {
   switch ($route_name) {
     case 'help.page.swiftmailer':
     case 'swiftmailer.transport_settings':

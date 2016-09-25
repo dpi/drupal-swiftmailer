@@ -1,6 +1,11 @@
 <?php
 
 /**
+ * @file
+ * Contains install and update functions for SwiftMailer.
+ */
+
+/**
  * Implements hook_requirements().
  */
 function swiftmailer_requirements($phase) {
@@ -24,6 +29,6 @@ function swiftmailer_install() {
   $settings = Drupal::configFactory()->getEditable('mailsystem.settings');
   $settings->set('modules.swiftmailer.none', [
     'formatter' => 'swiftmailer',
-    'sender' => 'swiftmailer'
+    'sender' => 'swiftmailer',
   ])->save();
 }

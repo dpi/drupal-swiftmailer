@@ -12,10 +12,9 @@ class ExampleMailTest extends BrowserTestBase {
 
   public static $modules = ['swiftmailer', 'mailsystem'];
 
-  protected function setUp() {
-    parent::setUp();
-  }
-
+  /**
+   * Tests the e-mail test form.
+   */
   public function testForm() {
     $account = $this->createUser(['administer swiftmailer']);
     $this->drupalLogin($account);

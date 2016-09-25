@@ -7,9 +7,14 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Url;
 
+/**
+ * Configuration form for SwiftMailer message settings.
+ */
 class MessagesForm extends ConfigFormBase {
 
-
+  /**
+   * {@inheritdoc}
+   */
   public function getFormId() {
     return 'swiftmailer_messages_form';
   }
@@ -23,6 +28,9 @@ class MessagesForm extends ConfigFormBase {
     ];
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function buildForm(array $form, FormStateInterface $form_state) {
     $form = parent::buildForm($form, $form_state);
     $config = $this->config('swiftmailer.message');
@@ -43,7 +51,7 @@ class MessagesForm extends ConfigFormBase {
     $form['format']['type'] = array(
       '#type' => 'radios',
       '#options' => array(SWIFTMAILER_FORMAT_PLAIN => t('Plain Text'), SWIFTMAILER_FORMAT_HTML => t('HTML')),
-      '#default_value' => $config->get('format')
+      '#default_value' => $config->get('format'),
     );
 
     $form['format']['respect'] = array(
@@ -89,10 +97,12 @@ class MessagesForm extends ConfigFormBase {
       '#default_value' => $config->get('character_set'),
     );
 
-
     return $form;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $config = $this->config('swiftmailer.message');
     $config->set('format', $form_state->getValue(['format', 'type']));
