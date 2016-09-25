@@ -6,6 +6,7 @@
  */
 
 use Drupal\Core\Render\Markup;
+use Drupal\Core\Url;
 
 include_once __DIR__ . '/includes/helpers/utilities.inc';
 
@@ -91,4 +92,19 @@ function swiftmailer_theme_suggestions_swiftmailer(array $variables) {
 function template_preprocess_swiftmailer(&$variables) {
   $variables['subject'] = $variables['message']['subject'];
   $variables['body'] = $variables['message']['body'];
+}
+
+/**
+ * Implements hook_help().
+ */
+function swiftmailer_help($route_name, \Drupal\Core\Routing\RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    case 'help.page.swiftmailer':
+    case 'swiftmailer.transport_settings':
+    case 'swiftmailer.message_settings':
+    case 'swiftmailer.test':
+      $output = '';
+      $output .= '<p>' . t('The Swift Mailer module is designed to replace the default mail system that is shipped with Drupal. The initial configuration of this is done through the <a href=":mailsystem_settings">Mail System module</a>. Swift Mailer allows you to choose how e-mails should be sent. To read more about how this module works, please have a look at the <a href=":documentation">Swift Mailer documentation</a>.', [':mailsystem_settings' => Url::fromRoute('mailsystem.settings')->toString(), ':documentation' => 'http://swiftmailer.org/docs/introduction.html']) . '</p>';
+      return $output;
+  }
 }

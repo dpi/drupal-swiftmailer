@@ -17,7 +17,7 @@ swiftmailer.message_settings:
   parent: swiftmailer.config
 
 swiftmailer.test:
-  title: 'Test'
+  title: 'Test e-mail settings'
   route_name: swiftmailer.message_settings
   description: 'Send a test e-mail to verify that the configuration works.'
   parent: swiftmailer.config
