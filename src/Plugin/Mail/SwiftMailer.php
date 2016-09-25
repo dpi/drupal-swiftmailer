@@ -118,7 +118,7 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
 
       if ($this->config['message']['convert_mode'] || !empty($message['params']['convert'])) {
         $converter = new Html2Text($message['body']);
-        $message['plain'] = $converter->get_text();
+        $message['plain'] = $converter->getText();
       }
     }
 

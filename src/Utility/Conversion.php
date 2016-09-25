@@ -262,7 +262,7 @@ class Conversion {
    *   TRUE if the provided header is an id header, and otherwise FALSE.
    */
   public static function swiftmailer_is_id_header($key, $value) {
-    if (valid_email_address($value) && $key == 'Message-ID') {
+    if (\Drupal::service('email.validator')->isValid($value) && $key == 'Message-ID') {
       return TRUE;
     }
     else {
@@ -308,7 +308,7 @@ class Conversion {
    *   TRUE if the provided header is a path header, and otherwise FALSE.
    */
   public static function swiftmailer_is_path_header($key, $value) {
-    if (valid_email_address($value) && $key == 'Return-Path') {
+    if (\Drupal::service('email.validator')->isValid($value) && $key == 'Return-Path') {
       return TRUE;
     }
     else {
