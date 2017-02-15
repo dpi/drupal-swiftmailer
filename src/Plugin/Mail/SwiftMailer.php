@@ -354,6 +354,7 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
       }
 
       // Send the message.
+      Conversion::swiftmailer_filter_message($m);
       return $mailer->send($m);
     }
     catch (Exception $e) {

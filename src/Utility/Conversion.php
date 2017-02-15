@@ -364,6 +364,7 @@ class Conversion {
    *   this return array
    */
   public static function swiftmailer_parse_mailboxes($value) {
+    $validator = \Drupal::service('email.validator');
 
     // Split mailboxes by ',' (comma) and ';' (semicolon).
     $mailboxes_raw = array();
@@ -385,15 +386,50 @@ class Conversion {
         $mailbox_components = explode('<', $mailbox_raw);
         $mailbox_name = trim(preg_replace("/\"/", "", $mailbox_components[0]));
         $mailbox_address = preg_replace('/>.*/', '', $mailbox_components[1]);
-        $mailboxes[$mailbox_address] = $mailbox_name;
+        if ($validator->isValid($mailbox_address)) {
+          $mailboxes[$mailbox_address] = $mailbox_name;
+        }
       }
       else {
-        $mailboxes[] = preg_replace("/(,|;)/", "", $mailbox_raw);
+        $mailbox_address = preg_replace("/(,|;)/", "", $mailbox_raw);
+        if ($validator->isValid($mailbox_address)) {
+          $mailboxes[] = $mailbox_address;
+        }
       }
-
     }
 
     return $mailboxes;
+  }
+
+
+  /**
+   * Filters out unwanted elements from a message.
+   *
+   * @param Swift_Message $message
+   *   The message which unwanted elements is to be filtered out from.
+   */
+  public static function swiftmailer_filter_message(Swift_Message $message) {
+    $headers = $message->getHeaders();
+
+    $senders = $headers->get('From')->getAddresses();
+    if (!empty($senders)) {
+      for ($i = 0; $i < count($senders); $i++) {
+        if (!\Drupal::service('email.validator')->isValid($senders[$i])) {
+          $headers->remove('From', $i);
+          \Drupal::logger('swiftmailer')->warning('The invalid "From" e-mail address "@mail" was skipped.', array('@mail' => $senders[$i]));
+        }
+      }
+    }
+
+    $recipients = $headers->get('To')->getAddresses();
+    if (!empty($recipients)) {
+      for ($i = 0; $i < count($recipients); $i++) {
+        if (!\Drupal::service('email.validator')->isValid($recipients[$i])) {
+          $headers->remove('To', $i);
+          \Drupal::logger('swiftmailer')->warning('The invalid "To" e-mail address "@mail" was skipped.', array('@mail' => $recipients[$i]));
+        }
+      }
+    }
   }
 
 }
