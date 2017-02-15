@@ -318,6 +318,7 @@ class SWIFTMailSystem implements MailSystemInterface {
         }
       }
       drupal_alter('swiftmailer', $mailer, $m);
+      swiftmailer_filter_message($m);
       // Send the message.
       return $mailer->send($m);
 
