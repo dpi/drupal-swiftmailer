@@ -80,7 +80,7 @@ class MessagesForm extends ConfigFormBase {
       '#type' => 'checkbox',
       '#title' => t('Generate alternative plain text version.'),
       '#default_value' => $config->get('convert_mode'),
-      '#description' => t('Please refer to @link for more details about how the alternative plain text version will be generated.', array('@link' => Link::fromTextAndUrl('html2text', Url::fromUri('http://www.chuggnutt.com/html2text')))),
+      '#description' => t('Please refer to @link for more details about how the alternative plain text version will be generated.', array('@link' => Link::fromTextAndUrl('html2text', Url::fromUri('http://www.chuggnutt.com/html2text'))->toString())),
     );
 
     $form['character_set'] = array(
