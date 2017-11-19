@@ -20,7 +20,7 @@ responsible for actually making the Swift Mailer module available to Drupal.
 
 1.0 Configuration
 
-Please go to 'admin/config/people/swiftmailer' to configure the Swift Mailer
+Please go to 'admin/config/swiftmailer/transport' to configure the Swift Mailer
 module.
 
 The module requires you to download the Swift Mailer library separately to a
