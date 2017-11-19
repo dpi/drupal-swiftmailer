@@ -98,7 +98,7 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
    * @param array $message
    *   A message array holding all relevant details for the message.
    *
-   * @return string
+   * @return array
    *   The message as it should be sent.
    */
   public function format(array $message) {
@@ -355,10 +355,9 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
 
       // Send the message.
       Conversion::swiftmailer_filter_message($m);
-      return $mailer->send($m);
+      return (bool) $mailer->send($m);
     }
     catch (Exception $e) {
-
       $headers = !empty($m) ? $m->getHeaders() : '';
       $headers = !empty($headers) ? nl2br($headers->toString()) : 'No headers were found.';
       $this->logger->error(
@@ -368,6 +367,7 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
         array('@exception_message' => $e->getMessage(), '@headers' => $headers));
       drupal_set_message(t('An attempt to send an e-mail message failed.'), 'error');
     }
+    return FALSE;
   }
 
   /**
