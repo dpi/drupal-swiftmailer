@@ -51,7 +51,7 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
   protected $logger;
 
   /**
-   * @var \Drupal\Core\Render\RendererInterface;
+   * @var \Drupal\Core\Render\RendererInterface
    */
   protected $renderer;
 
@@ -69,7 +69,7 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
    * @param \Drupal\Core\Render\RendererInterface $renderer
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    */
-  function __construct(ImmutableConfig $transport, ImmutableConfig $message, LoggerInterface $logger, RendererInterface $renderer, ModuleHandlerInterface $module_handler) {
+  public function __construct(ImmutableConfig $transport, ImmutableConfig $message, LoggerInterface $logger, RendererInterface $renderer, ModuleHandlerInterface $module_handler) {
     $this->config['transport'] = $transport->get();
     $this->config['message'] = $message->get();
     $this->logger = $logger;
@@ -109,10 +109,10 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
 
     // Theme message if format is set to be HTML.
     if ($applicable_format == SWIFTMAILER_FORMAT_HTML) {
-      $render = array(
+      $render = [
         '#theme' => isset($message['params']['theme']) ? $message['params']['theme'] : 'swiftmailer',
         '#message' => $message,
-      );
+      ];
 
       $message['body'] = $this->renderer->renderRoot($render);
 
@@ -126,8 +126,8 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
     // in the process. All we do here is to alter the message so that image
     // paths are replaced with cid's. Each image gets added to the array
     // which keeps track of which images to embed in the e-mail.
-    $embeddable_images = array();
-    $processed_images = array();
+    $embeddable_images = [];
+    $processed_images = [];
     preg_match_all('/"image:([^"]+)"/', $message['body'], $embeddable_images);
     for ($i = 0; $i < count($embeddable_images[0]); $i++) {
       $image_id = $embeddable_images[0][$i];
@@ -162,7 +162,7 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
    * @param array $message
    *   A message array holding all relevant details for the message.
    *
-   * @return boolean
+   * @return bool
    *   TRUE if the message was successfully sent, and otherwise FALSE.
    */
   public function mail(array $message) {
@@ -263,11 +263,11 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
 
       // Validate that $message['params']['files'] is an array.
       if (empty($message['params']['files']) || !is_array($message['params']['files'])) {
-        $message['params']['files'] = array();
+        $message['params']['files'] = [];
       }
 
       // Let other modules get the chance to add attachable files.
-      $files = $this->moduleHandler->invokeAll('swiftmailer_attach', array('key' => $message['key'], 'message' => $message));
+      $files = $this->moduleHandler->invokeAll('swiftmailer_attach', ['key' => $message['key'], 'message' => $message]);
       if (!empty($files) && is_array($files)) {
         $message['params']['files'] = array_merge(array_values($message['params']['files']), array_values($files));
       }
@@ -364,7 +364,7 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
         'An attempt to send an e-mail message failed, and the following error
         message was returned : @exception_message<br /><br />The e-mail carried
         the following headers:<br /><br />@headers',
-        array('@exception_message' => $e->getMessage(), '@headers' => $headers));
+        ['@exception_message' => $e->getMessage(), '@headers' => $headers]);
       drupal_set_message(t('An attempt to send an e-mail message failed.'), 'error');
     }
     return FALSE;
@@ -373,7 +373,7 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
   /**
    * Process attachments.
    *
-   * @param Swift_Message $m
+   * @param \Swift_Message $m
    *   The message which attachments are to be added to.
    * @param array $files
    *   The files which are to be added as attachments to the provided message.
@@ -411,9 +411,9 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
   /**
    * Process MimeMail attachments.
    *
-   * @param Swift_Message $m
+   * @param \Swift_Message $m
    *   The message which attachments are to be added to.
-   * @param array $attachments.
+   * @param array $attachments
    *   The attachments which are to be added message.
    */
   private function attachAsMimeMail(Swift_Message $m, array $attachments) {
@@ -436,7 +436,7 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
           $file->uri = $a['filepath'];
           $file->filename = $a['filename'];
           $file->filemime = $a['filemime'];
-          $this->attach($m, array($file));
+          $this->attach($m, [$file]);
         }
         else {
           $m->attach(Swift_Attachment::newInstance($a['filecontent'], $a['filename'], $a['filemime']));
@@ -448,7 +448,7 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
   /**
    * Process inline images..
    *
-   * @param Swift_Message $m
+   * @param \Swift_Message $m
    *   The message which inline images are to be added to.
    * @param array $images
    *   The images which are to be added as inline images to the provided

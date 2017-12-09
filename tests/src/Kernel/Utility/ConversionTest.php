@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\swiftmailer\Unit\Utility\Conversion.
- */
-
 namespace Drupal\Tests\swiftmailer\Unit\Utility;
 
 use Drupal\KernelTests\KernelTestBase;
@@ -24,28 +19,28 @@ class ConversionTest extends KernelTestBase {
   }
 
   /**
-   * dataProvider for ::test_swiftmailer_parse_mailboxes
+   * DataProvider for ::test_swiftmailer_parse_mailboxes.
    */
   public function swiftmailer_parse_mailboxes_dataProvider() {
     return [
       [
         'mail@example.com',
         [
-          'mail@example.com'
-        ]
+          'mail@example.com',
+        ],
       ],
       [
         'mail1@example.com;mail2@example.com',
         [
           'mail1@example.com',
-          'mail2@example.com'
-        ]
+          'mail2@example.com',
+        ],
       ],
       [
         'mail1@example.com;invalid-email',
         [
           'mail1@example.com',
-        ]
+        ],
       ],
     ];
   }

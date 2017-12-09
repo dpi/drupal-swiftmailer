@@ -39,17 +39,17 @@ class SettingsForm extends ConfigFormBase {
     $form['#tree'] = TRUE;
 
     // Display a page description.
-    $form['description'] = array(
-      '#markup' => '<p>' . t('This page allows you to configure settings which determines how e-mail messages are sent.') . '</p>',
-    );
+    $form['description'] = [
+      '#markup' => '<p>' . $this->t('This page allows you to configure settings which determines how e-mail messages are sent.') . '</p>',
+    ];
 
-    $form['transport'] = array(
+    $form['transport'] = [
       '#id' => 'transport',
       '#type' => 'details',
-      '#title' => t('Transport types'),
-      '#description' => t('Which transport type should Drupal use to send e-mails?'),
+      '#title' => $this->t('Transport types'),
+      '#description' => $this->t('Which transport type should Drupal use to send e-mails?'),
       '#open' => TRUE,
-    );
+    ];
 
     // Display the currently configured transport type, or alternatively the
     // currently selected transport type if the user has chosen to configure
@@ -57,170 +57,170 @@ class SettingsForm extends ConfigFormBase {
     $transport = $config->get('transport');
     $transport = ($form_state->hasValue(['transport', 'type'])) ? $form_state->getValue(['transport', 'type']) : $transport;
 
-    $form['transport']['type'] = array(
+    $form['transport']['type'] = [
       '#type' => 'radios',
-      '#options' => array(
-        SWIFTMAILER_TRANSPORT_SMTP => t('SMTP'),
-        SWIFTMAILER_TRANSPORT_SENDMAIL => t('Sendmail'),
-        SWIFTMAILER_TRANSPORT_NATIVE => t('PHP'),
-        SWIFTMAILER_TRANSPORT_SPOOL => t('Spool'),
-      ),
+      '#options' => [
+        SWIFTMAILER_TRANSPORT_SMTP => $this->t('SMTP'),
+        SWIFTMAILER_TRANSPORT_SENDMAIL => $this->t('Sendmail'),
+        SWIFTMAILER_TRANSPORT_NATIVE => $this->t('PHP'),
+        SWIFTMAILER_TRANSPORT_SPOOL => $this->t('Spool'),
+      ],
       '#default_value' => $transport,
-      '#ajax' => array(
-        'callback' => array($this, 'ajaxCallback'),
+      '#ajax' => [
+        'callback' => [$this, 'ajaxCallback'],
         'wrapper' => 'transport_configuration',
         'method' => 'replace',
         'effect' => 'fade',
-      ),
-      '#description' => t('Not sure which transport type to choose? The @documentation gives you a good overview of the various transport types.', array('@documentation' => Link::fromTextAndUrl((string) $this->t('Swift Mailer documentation'), Url::fromUri('http://swiftmailer.org/docs/sending.html#transport-types'))->toString())),
-    );
+      ],
+      '#description' => $this->t('Not sure which transport type to choose? The @documentation gives you a good overview of the various transport types.', ['@documentation' => Link::fromTextAndUrl((string) $this->t('Swift Mailer documentation'), Url::fromUri('http://swiftmailer.org/docs/sending.html#transport-types'))->toString()]),
+    ];
 
-    $form['transport']['configuration'] = array(
+    $form['transport']['configuration'] = [
       '#type' => 'item',
       '#id' => 'transport_configuration',
-    );
+    ];
 
-    $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_SMTP] = array(
+    $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_SMTP] = [
       '#type' => 'item',
       '#access' => $form['transport']['type']['#default_value'] == SWIFTMAILER_TRANSPORT_SMTP,
-    );
+    ];
 
-    $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_SMTP]['title'] = array(
-      '#markup' => '<h3>' . t('SMTP transport options') . '</h3>',
-    );
+    $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_SMTP]['title'] = [
+      '#markup' => '<h3>' . $this->t('SMTP transport options') . '</h3>',
+    ];
 
-    $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_SMTP]['description'] = array(
-      '#markup' => '<p>' . t('This transport type will send all e-mails using a SMTP
+    $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_SMTP]['description'] = [
+      '#markup' => '<p>' . $this->t('This transport type will send all e-mails using a SMTP
       server of your choice. You need to specify which SMTP server
       to use. Please refer to the @documentation for more details
       about this transport type.',
-          array('@documentation' => Link::fromTextAndUrl($this->t('Swift Mailer documentation'), Url::fromUri('http://swiftmailer.org/docs/sending.html#the-smtp-transport'))->toString())) . '</p>',
-    );
+          ['@documentation' => Link::fromTextAndUrl($this->t('Swift Mailer documentation'), Url::fromUri('http://swiftmailer.org/docs/sending.html#the-smtp-transport'))->toString()]) . '</p>',
+    ];
 
-    $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_SMTP]['server'] = array(
+    $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_SMTP]['server'] = [
       '#type' => 'textfield',
-      '#title' => t('SMTP server'),
-      '#description' => t('The hostname or IP address at which the SMTP server can be reached.'),
+      '#title' => $this->t('SMTP server'),
+      '#description' => $this->t('The hostname or IP address at which the SMTP server can be reached.'),
       '#required' => TRUE,
       '#default_value' => $config->get('smtp_host'),
-    );
+    ];
 
-    $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_SMTP]['port'] = array(
+    $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_SMTP]['port'] = [
       '#type' => 'textfield',
-      '#title' => t('Port'),
-      '#description' => t('The port at which the SMTP server can be reached (defaults to 25)'),
+      '#title' => $this->t('Port'),
+      '#description' => $this->t('The port at which the SMTP server can be reached (defaults to 25)'),
       '#default_value' => $config->get('smtp_port'),
       '#size' => 10,
-    );
+    ];
 
-    $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_SMTP]['encryption'] = array(
+    $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_SMTP]['encryption'] = [
       '#type' => 'select',
-      '#title' => t('Encryption'),
+      '#title' => $this->t('Encryption'),
       '#options' => swiftmailer_get_encryption_options(),
-      '#description' => t('The type of encryption which should be used (if any)'),
+      '#description' => $this->t('The type of encryption which should be used (if any)'),
       '#default_value' => $config->get('smtp_encryption'),
-    );
+    ];
 
-    $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_SMTP]['username'] = array(
+    $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_SMTP]['username'] = [
       '#type' => 'textfield',
-      '#title' => t('Username'),
-      '#description' => t('A username required by the SMTP server (leave blank if not required)'),
+      '#title' => $this->t('Username'),
+      '#description' => $this->t('A username required by the SMTP server (leave blank if not required)'),
       '#default_value' => $config->get('smtp_username'),
-      '#attributes' => array(
+      '#attributes' => [
         'autocomplete' => 'off',
-      ),
-    );
+      ],
+    ];
 
-    $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_SMTP]['password'] = array(
+    $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_SMTP]['password'] = [
       '#type' => 'password',
-      '#title' => t('Password'),
-      '#description' => t('A password required by the SMTP server (leave blank if not required)'),
+      '#title' => $this->t('Password'),
+      '#description' => $this->t('A password required by the SMTP server (leave blank if not required)'),
       '#default_value' => $config->get('smtp_password'),
-      '#attributes' => array(
+      '#attributes' => [
         'autocomplete' => 'off',
-      ),
-    );
+      ],
+    ];
 
     $current_password = $config->get('smtp_password');
     if (!empty($current_password)) {
-      $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_SMTP]['password']['#description'] = t('A password
+      $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_SMTP]['password']['#description'] = $this->t('A password
       required by the SMTP server. <em>The currently set password is hidden for security reasons</em>.');
     }
 
-    $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_SENDMAIL] = array(
+    $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_SENDMAIL] = [
       '#type' => 'item',
       '#access' => $form['transport']['type']['#default_value'] == SWIFTMAILER_TRANSPORT_SENDMAIL,
-    );
+    ];
 
-    $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_SENDMAIL]['title'] = array(
-      '#markup' => '<h3>' . t('Sendmail transport options') . '</h3>',
-    );
+    $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_SENDMAIL]['title'] = [
+      '#markup' => '<h3>' . $this->t('Sendmail transport options') . '</h3>',
+    ];
 
-    $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_SENDMAIL]['description'] = array(
-      '#markup' => '<p>' . t('This transport type will send all e-mails using a locally
+    $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_SENDMAIL]['description'] = [
+      '#markup' => '<p>' . $this->t('This transport type will send all e-mails using a locally
       installed MTA such as Sendmail. You need to specify which
       locally installed MTA to use by providing a path to the
       MTA. If you do not provide any path then Swift Mailer
       defaults to /usr/sbin/sendmail. You can read more about
       this transport type in the @documentation.',
-          array('@documentation' => Link::fromTextAndUrl($this->t('Swift Mailer documentation'), Url::fromUri('http://swiftmailer.org/docs/sending.html#the-sendmail-transport'))->toString())) . '</p>',
-    );
+          ['@documentation' => Link::fromTextAndUrl($this->t('Swift Mailer documentation'), Url::fromUri('http://swiftmailer.org/docs/sending.html#the-sendmail-transport'))->toString()]) . '</p>',
+    ];
 
-    $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_SENDMAIL]['path'] = array(
+    $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_SENDMAIL]['path'] = [
       '#type' => 'textfield',
-      '#title' => t('MTA path'),
-      '#description' => t('The absolute path to the locally installed MTA.'),
+      '#title' => $this->t('MTA path'),
+      '#description' => $this->t('The absolute path to the locally installed MTA.'),
       '#default_value' => $config->get('sendmail_path'),
-    );
+    ];
 
-    $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_SENDMAIL]['mode'] = array(
+    $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_SENDMAIL]['mode'] = [
       '#type' => 'radios',
-      '#title' => t('Mode'),
-      '#options' => array('bs' => 'bs', 't' => 't '),
-      '#description' => t('Not sure which option to choose? Go with <em>bs</em>. You can read more about the above two modes in the @documentation.', array('@documentation' => Link::fromTextAndUrl($this->t('Swift Mailer documentation'), Url::fromUri('http://swiftmailer.org/docs/sendmail-transport'))->toString())),
+      '#title' => $this->t('Mode'),
+      '#options' => ['bs' => 'bs', 't' => 't '],
+      '#description' => $this->t('Not sure which option to choose? Go with <em>bs</em>. You can read more about the above two modes in the @documentation.', ['@documentation' => Link::fromTextAndUrl($this->t('Swift Mailer documentation'), Url::fromUri('http://swiftmailer.org/docs/sendmail-transport'))->toString()]),
       '#default_value' => $config->get('sendmail_mode'),
-    );
+    ];
 
-    $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_NATIVE] = array(
+    $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_NATIVE] = [
       '#type' => 'item',
       '#access' => $form['transport']['type']['#default_value'] == SWIFTMAILER_TRANSPORT_NATIVE,
-    );
+    ];
 
-    $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_NATIVE]['title'] = array(
-      '#markup' => '<h3>' . t('PHP transport options') . '</h3>',
-    );
+    $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_NATIVE]['title'] = [
+      '#markup' => '<h3>' . $this->t('PHP transport options') . '</h3>',
+    ];
 
-    $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_NATIVE]['description'] = array(
-      '#markup' => '<p>' . t('This transport type will send all e-mails using the built-in
+    $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_NATIVE]['description'] = [
+      '#markup' => '<p>' . $this->t('This transport type will send all e-mails using the built-in
       mail functionality of PHP. This transport type can not be
       configured here. Please refer to the @documentation if you
       would like to read more about how the built-in mail functionality
       in PHP can be configured.',
-          array('@documentation' => Link::fromTextAndUrl($this->t('PHP documentation'), Url::fromUri('http://www.php.net/manual/en/mail.configuration.php'))->toString())) . '</p>',
-    );
+          ['@documentation' => Link::fromTextAndUrl($this->t('PHP documentation'), Url::fromUri('http://www.php.net/manual/en/mail.configuration.php'))->toString()]) . '</p>',
+    ];
 
-    $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_SPOOL] = array(
+    $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_SPOOL] = [
       '#type' => 'item',
       '#access' => $form['transport']['type']['#default_value'] == SWIFTMAILER_TRANSPORT_SPOOL,
-    );
+    ];
 
-    $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_SPOOL]['title'] = array(
-      '#markup' => '<h3>' . t('Spool transport options') . '</h3>',
-    );
+    $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_SPOOL]['title'] = [
+      '#markup' => '<h3>' . $this->t('Spool transport options') . '</h3>',
+    ];
 
-    $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_SPOOL]['description'] = array(
-      '#markup' => '<p>' . t('This transport does not attempt to send the email
+    $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_SPOOL]['description'] = [
+      '#markup' => '<p>' . $this->t('This transport does not attempt to send the email
     but instead saves the message to a spool file. Another process can then
     read from the spool and take care of sending the emails.') . '</p>',
-    );
+    ];
 
     $spool_directory = $config->get('spool_directory');
-    $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_SPOOL]['directory'] = array(
+    $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_SPOOL]['directory'] = [
       '#type' => 'textfield',
-      '#title' => t('Spool directory'),
-      '#description' => t('The absolute path to the spool directory.'),
+      '#title' => $this->t('Spool directory'),
+      '#description' => $this->t('The absolute path to the spool directory.'),
       '#default_value' => !empty($spool_directory) ? $spool_directory : sys_get_temp_dir() . '/swiftmailer-spool',
-    );
+    ];
 
     return $form;
   }
