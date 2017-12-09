@@ -242,25 +242,25 @@ class SettingsForm extends ConfigFormBase {
           $config->set('smtp_username', $form_state->getValue(['transport', 'configuration', SWIFTMAILER_TRANSPORT_SMTP, 'username']));
           $config->set('smtp_password', $form_state->getValue(['transport', 'configuration', SWIFTMAILER_TRANSPORT_SMTP, 'password']));
           $config->save();
-          drupal_set_message(t('Drupal has been configured to send all e-mails using the SMTP transport type.'), 'status');
+          drupal_set_message($this->t('Drupal has been configured to send all e-mails using the SMTP transport type.'), 'status');
           break;
 
         case SWIFTMAILER_TRANSPORT_SENDMAIL:
           $config->set('sendmail_path', $form_state->getValue(['transport', 'configuration', SWIFTMAILER_TRANSPORT_SENDMAIL, 'path']));
           $config->set('sendmail_mode', $form_state->getValue(['transport', 'configuration', SWIFTMAILER_TRANSPORT_SENDMAIL, 'mode']));
           $config->save();
-          drupal_set_message(t('Drupal has been configured to send all e-mails using the Sendmail transport type.'), 'status');
+          drupal_set_message($this->t('Drupal has been configured to send all e-mails using the Sendmail transport type.'), 'status');
           break;
 
         case SWIFTMAILER_TRANSPORT_NATIVE:
           $config->save();
-          drupal_set_message(t('Drupal has been configured to send all e-mails using the PHP transport type.'), 'status');
+          drupal_set_message($this->t('Drupal has been configured to send all e-mails using the PHP transport type.'), 'status');
           break;
 
         case SWIFTMAILER_TRANSPORT_SPOOL:
           $config->set('spool_directory', $form_state->getValue(['transport', 'configuration', SWIFTMAILER_TRANSPORT_SPOOL, 'directory']));
           $config->save();
-          drupal_set_message(t('Drupal has been configured to send all e-mails using the Spool transport type.'), 'status');
+          drupal_set_message($this->t('Drupal has been configured to send all e-mails using the Spool transport type.'), 'status');
           break;
       }
     }
@@ -273,7 +273,7 @@ class SettingsForm extends ConfigFormBase {
    * @return array
    *   The form element containing the configuration options.
    */
-  public static function ajaxCallback($form, &$form_state) {
+  public static function ajaxCallback($form, FormStateInterface $form_state) {
     return $form['transport']['configuration'];
   }
 
