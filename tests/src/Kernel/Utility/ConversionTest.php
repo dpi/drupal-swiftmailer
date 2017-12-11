@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\Tests\swiftmailer\Unit\Utility;
+namespace Drupal\Tests\swiftmailer\Kernel\Utility;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\swiftmailer\Utility\Conversion;
