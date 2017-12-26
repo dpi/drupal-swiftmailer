@@ -23,12 +23,11 @@ responsible for actually making the Swift Mailer module available to Drupal.
 Please go to 'admin/config/swiftmailer/transport' to configure the Swift Mailer
 module.
 
-The module requires you to download the Swift Mailer library separately to a
-directory of your choice (relative to the Drupal installation). However, it is
-advised that libraries are kept in the 'sites/all/libraries' directory. If you
-keep the Swift Mailer library in 'sites/all/libraries/swiftmailer', then you
-need to configure the module to look for the Swift Mailer library in that
-directory.
+The module requires you to download the Swift Mailer library with composer. You
+should require the module itself with composer. Please the the documentation on
+Drupal.org for further information on this topic.
+
+https://www.drupal.org/docs/develop/using-composer/using-composer-to-manage-drupal-site-dependencies#managing-contributed
 
 After the module has been configured with the Swift Mailer library you are
 advised to make sure that the Swift Mailer library sends e-mails using the
