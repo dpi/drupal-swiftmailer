@@ -588,7 +588,21 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
     // separated by the mail line endings. Keep Markup objects and escape others
     // and then treat the result as safe markup.
     $line_endings = Settings::get('mail_line_endings', PHP_EOL);
-    $message['body'] = Markup::create(implode($line_endings, array_map(function ($body) {
+    $applicable_format = $this->getApplicableFormat($message);
+    $filter_format = $this->config['message']['filter_format'];
+    $message['body'] = Markup::create(implode($line_endings, array_map(function ($body) use ($applicable_format, $filter_format) {
+      // If the body contains no html tags but the applicable format is HTML,
+      // we can assume newlines will need be converted to <br>.
+      if ($applicable_format == SWIFTMAILER_FORMAT_HTML && Unicode::strlen(strip_tags($body)) === Unicode::strlen($body)) {
+        // The default fallback format is 'plain_text', which escapes markup,
+        // converts new lines to <br> and converts URLs to links.
+        $build = [
+          '#type' => 'processed_text',
+          '#text' => $body,
+          '#format' => $filter_format,
+        ];
+        $body = $this->renderer->renderPlain($build);
+      }
       // If $item is not marked safe then it will be escaped.
       return $body instanceof MarkupInterface ? $body : Html::escape($body);
     }, $message['body'])));

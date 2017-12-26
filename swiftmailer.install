@@ -32,3 +32,12 @@ function swiftmailer_install() {
     'sender' => 'swiftmailer',
   ])->save();
 }
+
+/**
+ * Set default filter_format for HTML emails with no HTML markup.
+ */
+function swiftmailer_update_8101() {
+ Drupal::configFactory()->getEditable('swiftmailer.message')
+   ->set('filter_format', 'plain_text')
+   ->save();
+}

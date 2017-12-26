@@ -5,6 +5,9 @@ swiftmailer.message:
     format:
       type: string
       label: 'Message format'
+    filter_format:
+      type: string
+      label: 'Filter format'
     respect_format:
       type: boolean
       label: 'Respect format'
