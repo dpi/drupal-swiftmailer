@@ -25,6 +25,7 @@ use Swift_Image;
 use Swift_Mailer;
 use Swift_MailTransport;
 use Swift_Message;
+use Swift_NullTransport;
 use Swift_SendmailTransport;
 use Swift_SmtpTransport;
 use Swift_SpoolTransport;
@@ -352,8 +353,6 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
           if (!empty($password)) {
             $transport->setPassword($password);
           }
-
-          $mailer = Swift_Mailer::newInstance($transport);
           break;
 
         case SWIFTMAILER_TRANSPORT_SENDMAIL:
@@ -363,13 +362,11 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
 
           // Instantiate transport.
           $transport = Swift_SendmailTransport::newInstance($path . ' -' . $mode);
-          $mailer = Swift_Mailer::newInstance($transport);
           break;
 
         case SWIFTMAILER_TRANSPORT_NATIVE:
           // Instantiate transport.
           $transport = Swift_MailTransport::newInstance();
-          $mailer = Swift_Mailer::newInstance($transport);
           break;
 
         case SWIFTMAILER_TRANSPORT_SPOOL:
@@ -377,9 +374,21 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
           $spooldir = $this->config['transport']['spool_directory'];
           $spool = new Swift_FileSpool($spooldir);
           $transport = Swift_SpoolTransport::newInstance($spool);
-          $mailer = Swift_Mailer::newInstance($transport);
+          break;
+
+        case SWIFTMAILER_TRANSPORT_NULL:
+          $transport = Swift_NullTransport::newInstance();
           break;
       }
+
+      if (!isset($transport)) {
+        throw new \LogicException('The transport method is undefined.');
+      }
+
+      $mailer = Swift_Mailer::newInstance($transport);
+
+      // Allows other modules to customize the message.
+      $this->moduleHandler->alter('swiftmailer', $mailer, $m, $message);
 
       // Send the message.
       Conversion::swiftmailer_filter_message($m);

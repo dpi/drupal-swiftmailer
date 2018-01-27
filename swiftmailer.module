@@ -23,6 +23,7 @@ define('SWIFTMAILER_TRANSPORT_SMTP', 'smtp');
 define('SWIFTMAILER_TRANSPORT_SENDMAIL', 'sendmail');
 define('SWIFTMAILER_TRANSPORT_NATIVE', 'native');
 define('SWIFTMAILER_TRANSPORT_SPOOL', 'spool');
+define('SWIFTMAILER_TRANSPORT_NULL', 'null');
 
 // Define header types.
 define('SWIFTMAILER_HEADER_TEXT', 'text');

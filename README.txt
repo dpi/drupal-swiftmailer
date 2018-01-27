@@ -92,7 +92,7 @@ $language
   The language used to compose the e-mail.
 $params
   An array of parameters. This is the $params optionally provided to
-  drupal_mail().
+  \Drupal\Core\Mail\MailManagerInterface::mail
 $subject
   The subject.
 $body
@@ -302,13 +302,13 @@ example demonstrates how this can be achieved.
 function test() {
 
   // Define message format.
-  $p = array(
+  $p = [
     'format' => 'text/html',
     'charset' => 'UTF-8',
-    );
+  ];
 
   // Send message.
-  drupal_mail('mymodule', 'key', 'test@test.com', language_default(), $p);
+  \Drupal::service('plugin.manager.mail')->mail('mymodule', 'key', 'test@test.com', \Drupal::languageManager()->getDefaultLanguage()->getId(), $p);
 
 }
 
@@ -337,3 +337,9 @@ simply provide the HTML version in $message['body'] and the plain text version
 in $message['plain']. Please make sure you set $message['params']['format'] to
 'text/html'. The Swift Mailer module will not attempt to generate a plain text
 version if one is already available.
+
+5.0 Custom settings/behavior
+
+If you want to add custom settings or behavior to the mailer or the message,
+before the it is sent, you can implement hook_swiftmailer_alter().
+See swiftmailer.api.php for an example.
