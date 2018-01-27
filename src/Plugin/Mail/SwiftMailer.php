@@ -13,6 +13,7 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Site\Settings;
+use Drupal\key\KeyInterface;
 use Drupal\swiftmailer\Utility\Conversion;
 use Exception;
 use Html2Text\Html2Text;
@@ -302,8 +303,38 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
             $host = $this->config['transport']['smtp_host'];
             $port = $this->config['transport']['smtp_port'];
             $encryption = $this->config['transport']['smtp_encryption'];
-            $username = $this->config['transport']['smtp_username'];
-            $password = $this->config['transport']['smtp_password'];
+            $provider =  $this->config['transport']['smtp_credential_provider'];
+            $username = NULL;
+            $password = NULL;
+            if ($provider === 'swiftmailer') {
+              $username = $this->config['transport']['smtp_credentials']['swiftmailer']['username'];
+              $password = $this->config['transport']['smtp_credentials']['swiftmailer']['password'];
+            }
+            elseif ($provider === 'key') {
+              /** @var \Drupal\Core\Entity\EntityStorageInterface $storage */
+              $storage = \Drupal::entityTypeManager()->getStorage('key');
+              /** @var \Drupal\key\KeyInterface $username_key */
+              $username_key = $storage->load($this->config['transport']['smtp_credentials']['key']['username']);
+              if ($username_key) {
+                $username = $username_key->getKeyValue();
+              }
+              /** @var \Drupal\key\KeyInterface $password_key */
+              $password_key = $storage->load($this->config['transport']['smtp_credentials']['key']['password']);
+              if ($password_key) {
+                $password = $password_key->getKeyValue();
+              }
+            }
+            elseif ($provider == 'multikey') {
+              /** @var \Drupal\Core\Entity\EntityStorageInterface $storage */
+              $storage = \Drupal::entityTypeManager()->getStorage('key');
+              /** @var \Drupal\key\KeyInterface $username_key */
+              $user_password_key = $storage->load($this->config['transport']['smtp_credentials']['multikey']['user_password']);
+              if ($user_password_key) {
+                $values = $user_password_key->getKeyValues();
+                $username = $values['username'];
+                $password = $values['password'];
+              }
+            }
 
             // Instantiate transport.
             $transport = Swift_SmtpTransport::newInstance($host, $port);

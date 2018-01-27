@@ -6,6 +6,8 @@ use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Url;
+use Drupal\key\KeyInterface;
+use Drupal\key\Entity\Key;
 
 /**
  * Swift Mailer settings form.
@@ -121,30 +123,89 @@ class SettingsForm extends ConfigFormBase {
       '#default_value' => $config->get('smtp_encryption'),
     ];
 
-    $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_SMTP]['username'] = [
-      '#type' => 'textfield',
-      '#title' => $this->t('Username'),
-      '#description' => $this->t('A username required by the SMTP server (leave blank if not required)'),
-      '#default_value' => $config->get('smtp_username'),
-      '#attributes' => [
-        'autocomplete' => 'off',
+    $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_SMTP]['credential_provider'] = array(
+      '#type' => 'select',
+      '#title' => $this->t('Credential provider'),
+      '#options' => [
+        'swiftmailer' => 'Swift Mailer',
       ],
-    ];
+      '#default_value' => $config->get('smtp_credential_provider'),
+      '#ajax' => array(
+        'callback' => array($this, 'ajaxCallback'),
+        'wrapper' => 'transport_configuration',
+        'method' => 'replace',
+        'effect' => 'fade',
+      ),
+    );
 
-    $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_SMTP]['password'] = [
-      '#type' => 'password',
-      '#title' => $this->t('Password'),
-      '#description' => $this->t('A password required by the SMTP server (leave blank if not required)'),
-      '#default_value' => $config->get('smtp_password'),
-      '#attributes' => [
-        'autocomplete' => 'off',
-      ],
-    ];
+    $smtp_credential_provider = $form_state->getValue(['transport', 'configuration', SWIFTMAILER_TRANSPORT_SMTP, 'credential_provider'], $config->get('smtp_credential_provider'));
 
-    $current_password = $config->get('smtp_password');
-    if (!empty($current_password)) {
-      $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_SMTP]['password']['#description'] = $this->t('A password
-      required by the SMTP server. <em>The currently set password is hidden for security reasons</em>.');
+    if (\Drupal::moduleHandler()->moduleExists('key')) {
+      $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_SMTP]['credential_provider']['#options']['key'] = 'Key Module';
+
+      /** @var \Drupal\key\Plugin\KeyPluginManager $key_type */
+      $key_type = \Drupal::service('plugin.manager.key.key_type');
+      if ($key_type->hasDefinition('user_password')) {
+        $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_SMTP]['credential_provider']['#options']['multikey'] = 'Key Module (user/password)';
+      }
+    }
+
+    if ($smtp_credential_provider === 'swiftmailer') {
+      $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_SMTP]['credentials']['swiftmailer']['username'] = array(
+        '#type' => 'textfield',
+        '#title' => $this->t('Username'),
+        '#description' => $this->t('A username required by the SMTP server (leave blank if not required)'),
+        '#default_value' => $config->get('smtp_credentials.swiftmailer.username'),
+        '#attributes' => array(
+          'autocomplete' => 'off',
+        ),
+      );
+
+      $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_SMTP]['credentials']['swiftmailer']['password'] = array(
+        '#type' => 'password',
+        '#title' => $this->t('Password'),
+        '#description' => $this->t('A password required by the SMTP server (leave blank if not required)'),
+        '#default_value' => $config->get('smtp_credentials.swiftmailer.password'),
+        '#attributes' => array(
+          'autocomplete' => 'off',
+        ),
+      );
+
+      $current_password = $config->get('smtp_credentials.swiftmailer.password');
+      if (!empty($current_password)) {
+        $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_SMTP]['credentials']['swiftmailer']['password']['#description'] = $this->t('A password required by the SMTP server. <em>The currently set password is hidden for security reasons</em>.');
+      }
+    }
+    elseif ($smtp_credential_provider === 'key') {
+      $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_SMTP]['credentials']['key']['username'] = array(
+        '#type' => 'key_select',
+        '#title' => $this->t('Username'),
+        '#description' => $this->t('A username required by the SMTP server.'),
+        '#default_value' => $config->get('smtp_credentials.key.username'),
+        '#empty_option' => $this->t('- Please select -'),
+        '#key_filters' => ['type' => 'authentication'],
+        '#required' => TRUE,
+      );
+      $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_SMTP]['credentials']['key']['password'] = array(
+        '#type' => 'key_select',
+        '#title' => $this->t('Password'),
+        '#description' => $this->t('A password required by the SMTP server.'),
+        '#default_value' => $config->get('smtp_credentials.key.password'),
+        '#empty_option' => $this->t('- Please select -'),
+        '#key_filters' => ['type' => 'authentication'],
+        '#required' => TRUE,
+      );
+    }
+    elseif ($smtp_credential_provider === 'multikey') {
+      $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_SMTP]['credentials']['multikey']['user_password'] = array(
+        '#type' => 'key_select',
+        '#title' => $this->t('User/password'),
+        '#description' => $this->t('A username + password required by the SMTP server.'),
+        '#default_value' => $config->get('smtp_credentials.multikey.user_password'),
+        '#empty_option' => $this->t('- Please select -'),
+        '#key_filters' => ['type' => 'user_password'],
+        '#required' => TRUE,
+      );
     }
 
     $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_SENDMAIL] = [
@@ -239,8 +300,10 @@ class SettingsForm extends ConfigFormBase {
           $config->set('smtp_host', $form_state->getValue(['transport', 'configuration', SWIFTMAILER_TRANSPORT_SMTP, 'server']));
           $config->set('smtp_port', $form_state->getValue(['transport', 'configuration', SWIFTMAILER_TRANSPORT_SMTP, 'port']));
           $config->set('smtp_encryption', $form_state->getValue(['transport', 'configuration', SWIFTMAILER_TRANSPORT_SMTP, 'encryption']));
-          $config->set('smtp_username', $form_state->getValue(['transport', 'configuration', SWIFTMAILER_TRANSPORT_SMTP, 'username']));
-          $config->set('smtp_password', $form_state->getValue(['transport', 'configuration', SWIFTMAILER_TRANSPORT_SMTP, 'password']));
+          $config->set('smtp_credential_provider', $form_state->getValue(['transport', 'configuration', SWIFTMAILER_TRANSPORT_SMTP, 'credential_provider']));
+          $config->set('smtp_credentials', [
+            $config->get('smtp_credential_provider') => $form_state->getValue(['transport', 'configuration', SWIFTMAILER_TRANSPORT_SMTP, 'credentials', $config->get('smtp_credential_provider')])
+          ]);
           $config->save();
           drupal_set_message($this->t('Drupal has been configured to send all e-mails using the SMTP transport type.'), 'status');
           break;
