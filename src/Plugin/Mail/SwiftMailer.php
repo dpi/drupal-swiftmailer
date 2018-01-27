@@ -291,104 +291,99 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
         $this->embed($m, $message['params']['images']);
       }
 
-      static $mailer;
+      // Get the configured transport type.
+      $transport_type = $this->config['transport']['transport'];
 
-      // If required, create a mailer which will be used to send the message.
-      if (empty($mailer)) {
-
-        // Get the configured transport type.
-        $transport_type = $this->config['transport']['transport'];
-
-        // Configure the mailer based on the configured transport type.
-        switch ($transport_type) {
-          case SWIFTMAILER_TRANSPORT_SMTP:
-            // Get transport configuration.
-            $host = $this->config['transport']['smtp_host'];
-            $port = $this->config['transport']['smtp_port'];
-            $encryption = $this->config['transport']['smtp_encryption'];
-            $provider =  $this->config['transport']['smtp_credential_provider'];
-            $username = NULL;
-            $password = NULL;
-            if ($provider === 'swiftmailer') {
-              $username = $this->config['transport']['smtp_credentials']['swiftmailer']['username'];
-              $password = $this->config['transport']['smtp_credentials']['swiftmailer']['password'];
+      // Configure the mailer based on the configured transport type.
+      switch ($transport_type) {
+        case SWIFTMAILER_TRANSPORT_SMTP:
+          // Get transport configuration.
+          $host = $this->config['transport']['smtp_host'];
+          $port = $this->config['transport']['smtp_port'];
+          $encryption = $this->config['transport']['smtp_encryption'];
+          $provider =  $this->config['transport']['smtp_credential_provider'];
+          $username = NULL;
+          $password = NULL;
+          if ($provider === 'swiftmailer') {
+            $username = $this->config['transport']['smtp_credentials']['swiftmailer']['username'];
+            $password = $this->config['transport']['smtp_credentials']['swiftmailer']['password'];
+          }
+          elseif ($provider === 'key') {
+            /** @var \Drupal\Core\Entity\EntityStorageInterface $storage */
+            $storage = \Drupal::entityTypeManager()->getStorage('key');
+            /** @var \Drupal\key\KeyInterface $username_key */
+            $username_key = $storage->load($this->config['transport']['smtp_credentials']['key']['username']);
+            if ($username_key) {
+              $username = $username_key->getKeyValue();
             }
-            elseif ($provider === 'key') {
-              /** @var \Drupal\Core\Entity\EntityStorageInterface $storage */
-              $storage = \Drupal::entityTypeManager()->getStorage('key');
-              /** @var \Drupal\key\KeyInterface $username_key */
-              $username_key = $storage->load($this->config['transport']['smtp_credentials']['key']['username']);
-              if ($username_key) {
-                $username = $username_key->getKeyValue();
-              }
-              /** @var \Drupal\key\KeyInterface $password_key */
-              $password_key = $storage->load($this->config['transport']['smtp_credentials']['key']['password']);
-              if ($password_key) {
-                $password = $password_key->getKeyValue();
-              }
+            /** @var \Drupal\key\KeyInterface $password_key */
+            $password_key = $storage->load($this->config['transport']['smtp_credentials']['key']['password']);
+            if ($password_key) {
+              $password = $password_key->getKeyValue();
             }
-            elseif ($provider == 'multikey') {
-              /** @var \Drupal\Core\Entity\EntityStorageInterface $storage */
-              $storage = \Drupal::entityTypeManager()->getStorage('key');
-              /** @var \Drupal\key\KeyInterface $username_key */
-              $user_password_key = $storage->load($this->config['transport']['smtp_credentials']['multikey']['user_password']);
-              if ($user_password_key) {
-                $values = $user_password_key->getKeyValues();
-                $username = $values['username'];
-                $password = $values['password'];
-              }
+          }
+          elseif ($provider == 'multikey') {
+            /** @var \Drupal\Core\Entity\EntityStorageInterface $storage */
+            $storage = \Drupal::entityTypeManager()->getStorage('key');
+            /** @var \Drupal\key\KeyInterface $username_key */
+            $user_password_key = $storage->load($this->config['transport']['smtp_credentials']['multikey']['user_password']);
+            if ($user_password_key) {
+              $values = $user_password_key->getKeyValues();
+              $username = $values['username'];
+              $password = $values['password'];
             }
+          }
 
-            // Instantiate transport.
-            $transport = Swift_SmtpTransport::newInstance($host, $port);
-            $transport->setLocalDomain('[127.0.0.1]');
+          // Instantiate transport.
+          $transport = Swift_SmtpTransport::newInstance($host, $port);
+          $transport->setLocalDomain('[127.0.0.1]');
 
-            // Set encryption (if any).
-            if (!empty($encryption)) {
-              $transport->setEncryption($encryption);
-            }
+          // Set encryption (if any).
+          if (!empty($encryption)) {
+            $transport->setEncryption($encryption);
+          }
 
-            // Set username (if any).
-            if (!empty($username)) {
-              $transport->setUsername($username);
-            }
+          // Set username (if any).
+          if (!empty($username)) {
+            $transport->setUsername($username);
+          }
 
-            // Set password (if any).
-            if (!empty($password)) {
-              $transport->setPassword($password);
-            }
+          // Set password (if any).
+          if (!empty($password)) {
+            $transport->setPassword($password);
+          }
 
-            $mailer = Swift_Mailer::newInstance($transport);
-            break;
+          $mailer = Swift_Mailer::newInstance($transport);
+          break;
 
-          case SWIFTMAILER_TRANSPORT_SENDMAIL:
-            // Get transport configuration.
-            $path = $this->config['transport']['sendmail_path'];
-            $mode = $this->config['transport']['sendmail_mode'];
+        case SWIFTMAILER_TRANSPORT_SENDMAIL:
+          // Get transport configuration.
+          $path = $this->config['transport']['sendmail_path'];
+          $mode = $this->config['transport']['sendmail_mode'];
 
-            // Instantiate transport.
-            $transport = Swift_SendmailTransport::newInstance($path . ' -' . $mode);
-            $mailer = Swift_Mailer::newInstance($transport);
-            break;
+          // Instantiate transport.
+          $transport = Swift_SendmailTransport::newInstance($path . ' -' . $mode);
+          $mailer = Swift_Mailer::newInstance($transport);
+          break;
 
-          case SWIFTMAILER_TRANSPORT_NATIVE:
-            // Instantiate transport.
-            $transport = Swift_MailTransport::newInstance();
-            $mailer = Swift_Mailer::newInstance($transport);
-            break;
+        case SWIFTMAILER_TRANSPORT_NATIVE:
+          // Instantiate transport.
+          $transport = Swift_MailTransport::newInstance();
+          $mailer = Swift_Mailer::newInstance($transport);
+          break;
 
-          case SWIFTMAILER_TRANSPORT_SPOOL:
-            // Instantiate transport.
-            $spooldir = $this->config['transport']['spool_directory'];
-            $spool = new Swift_FileSpool($spooldir);
-            $transport = Swift_SpoolTransport::newInstance($spool);
-            $mailer = Swift_Mailer::newInstance($transport);
-            break;
-        }
+        case SWIFTMAILER_TRANSPORT_SPOOL:
+          // Instantiate transport.
+          $spooldir = $this->config['transport']['spool_directory'];
+          $spool = new Swift_FileSpool($spooldir);
+          $transport = Swift_SpoolTransport::newInstance($spool);
+          $mailer = Swift_Mailer::newInstance($transport);
+          break;
       }
 
       // Send the message.
       Conversion::swiftmailer_filter_message($m);
+      /** @var Swift_Mailer $mailer */
       return (bool) $mailer->send($m);
     }
     catch (Exception $e) {
