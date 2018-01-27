@@ -235,15 +235,18 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
 
       // Set basic message details.
       Conversion::swiftmailer_remove_header($m, 'From');
+      Conversion::swiftmailer_remove_header($m, 'Reply-To');
       Conversion::swiftmailer_remove_header($m, 'To');
       Conversion::swiftmailer_remove_header($m, 'Subject');
 
-      // Parse 'from' and 'to' mailboxes.
+      // Parse 'from', 'to' and 'reply-to' mailboxes.
       $from = Conversion::swiftmailer_parse_mailboxes($message['from']);
       $to = Conversion::swiftmailer_parse_mailboxes($message['to']);
+      $reply_to = !empty($message['reply-to']) ? Conversion::swiftmailer_parse_mailboxes($message['reply-to']) : $from;
 
-      // Set 'from', 'to' and 'subject' headers.
+      // Set 'from', 'reply-to', 'to' and 'subject' headers.
       $m->setFrom($from);
+      $m->setReplyTo($reply_to);
       $m->setTo($to);
       $m->setSubject($message['subject']);
 
