@@ -91,8 +91,11 @@ function swiftmailer_theme_suggestions_swiftmailer(array $variables) {
  *   An associative array containing:
  *   - message: An associative array containing the message array.
  *   - body: The processed body.
+ *   - subject: The processed subject.
+ *   - base_url: The base url for this site including scheme, without trailing slash.
  */
 function template_preprocess_swiftmailer(&$variables) {
+  $variables['base_url'] = $GLOBALS['base_url'];
   $variables['subject'] = $variables['message']['subject'];
   $variables['body'] = $variables['message']['body'];
 }
