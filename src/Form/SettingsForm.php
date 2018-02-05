@@ -175,6 +175,10 @@ class SettingsForm extends ConfigFormBase {
       if (!empty($current_password)) {
         $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_SMTP]['credentials']['swiftmailer']['password']['#description'] = $this->t('A password required by the SMTP server. <em>The currently set password is hidden for security reasons</em>.');
       }
+      $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_SMTP]['credentials']['swiftmailer']['delete_password'] = array(
+        '#type' => 'checkbox',
+        '#title' => $this->t('Delete the stored password'),
+      );
     }
     elseif ($smtp_credential_provider === 'key') {
       $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_SMTP]['credentials']['key']['username'] = array(
@@ -284,6 +288,24 @@ class SettingsForm extends ConfigFormBase {
     ];
 
     return $form;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function validateForm(array &$form, FormStateInterface $form_state) {
+    if ($form_state->getValue(['transport', 'type']) == SWIFTMAILER_TRANSPORT_SMTP) {
+      if ($form_state->getValue(['transport', 'configuration', SWIFTMAILER_TRANSPORT_SMTP, 'credential_provider']) == 'swiftmailer') {
+        if (empty($form_state->getValue(['transport', 'configuration', SWIFTMAILER_TRANSPORT_SMTP, 'credentials', 'swiftmailer', 'password']))) {
+          $password = $this->config('swiftmailer.transport')->get('smtp_credentials.swiftmailer.password');
+          $form_state->setValue(['transport', 'configuration', SWIFTMAILER_TRANSPORT_SMTP, 'credentials', 'swiftmailer', 'password'], $password);
+        }
+        if ($form_state->getValue(['transport', 'configuration', SWIFTMAILER_TRANSPORT_SMTP, 'credentials', 'swiftmailer', 'delete_password'])) {
+          $form_state->setValue(['transport', 'configuration', SWIFTMAILER_TRANSPORT_SMTP, 'credentials', 'swiftmailer', 'password'], NULL);
+        }
+        $form_state->unsetValue(['transport', 'configuration', SWIFTMAILER_TRANSPORT_SMTP, 'credentials', 'swiftmailer', 'delete_password']);
+      }
+    }
   }
 
   /**
