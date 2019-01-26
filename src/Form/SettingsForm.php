@@ -316,6 +316,7 @@ class SettingsForm extends ConfigFormBase {
 
     if ($form_state->hasValue(['transport', 'type'])) {
       $config->set('transport', $form_state->getValue(['transport', 'type']));
+      $messenger = \Drupal::messenger();
 
       switch ($form_state->getValue(['transport', 'type'])) {
         case SWIFTMAILER_TRANSPORT_SMTP:
@@ -327,25 +328,25 @@ class SettingsForm extends ConfigFormBase {
             $config->get('smtp_credential_provider') => $form_state->getValue(['transport', 'configuration', SWIFTMAILER_TRANSPORT_SMTP, 'credentials', $config->get('smtp_credential_provider')])
           ]);
           $config->save();
-          drupal_set_message($this->t('Drupal has been configured to send all e-mails using the SMTP transport type.'), 'status');
+          $messenger->addStatus($this->t('Drupal has been configured to send all e-mails using the SMTP transport type.'));
           break;
 
         case SWIFTMAILER_TRANSPORT_SENDMAIL:
           $config->set('sendmail_path', $form_state->getValue(['transport', 'configuration', SWIFTMAILER_TRANSPORT_SENDMAIL, 'path']));
           $config->set('sendmail_mode', $form_state->getValue(['transport', 'configuration', SWIFTMAILER_TRANSPORT_SENDMAIL, 'mode']));
           $config->save();
-          drupal_set_message($this->t('Drupal has been configured to send all e-mails using the Sendmail transport type.'), 'status');
+          $messenger->addStatus($this->t('Drupal has been configured to send all e-mails using the Sendmail transport type.'));
           break;
 
         case SWIFTMAILER_TRANSPORT_NATIVE:
           $config->save();
-          drupal_set_message($this->t('Drupal has been configured to send all e-mails using the PHP transport type.'), 'status');
+          $messenger->addStatus($this->t('Drupal has been configured to send all e-mails using the PHP transport type.'));
           break;
 
         case SWIFTMAILER_TRANSPORT_SPOOL:
           $config->set('spool_directory', $form_state->getValue(['transport', 'configuration', SWIFTMAILER_TRANSPORT_SPOOL, 'directory']));
           $config->save();
-          drupal_set_message($this->t('Drupal has been configured to send all e-mails using the Spool transport type.'), 'status');
+          $messenger->addStatus($this->t('Drupal has been configured to send all e-mails using the Spool transport type.'));
           break;
       }
     }

@@ -403,7 +403,7 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
         message was returned : @exception_message<br /><br />The e-mail carried
         the following headers:<br /><br />@headers',
         ['@exception_message' => $e->getMessage(), '@headers' => $headers]);
-      drupal_set_message(t('An attempt to send an e-mail message failed.'), 'error');
+      \Drupal::messenger()->addError(t('An attempt to send an e-mail message failed.'));
     }
     return FALSE;
   }
