@@ -14,21 +14,16 @@ use Drupal\Core\Render\Markup;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Site\Settings;
 use Drupal\key\KeyInterface;
+use Drupal\swiftmailer\TransportFactoryInterface;
 use Drupal\swiftmailer\Utility\Conversion;
 use Exception;
 use Html2Text\Html2Text;
 use Psr\Log\LoggerInterface;
 use stdClass;
 use Swift_Attachment;
-use Swift_FileSpool;
 use Swift_Image;
 use Swift_Mailer;
-use Swift_MailTransport;
 use Swift_Message;
-use Swift_NullTransport;
-use Swift_SendmailTransport;
-use Swift_SmtpTransport;
-use Swift_SpoolTransport;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -43,36 +38,56 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
 
   /**
+   * An array containing configuration settings.
+   *
    * @var array
    */
   protected $config;
 
   /**
+   * The logger instance.
+   *
    * @var \Psr\Log\LoggerInterface
    */
   protected $logger;
 
   /**
+   * The renderer.
+   *
    * @var \Drupal\Core\Render\RendererInterface
    */
   protected $renderer;
 
   /**
+   * The module handler.
+   *
    * @var \Drupal\Core\Extension\ModuleHandlerInterface
    */
   protected $moduleHandler;
 
   /**
+   * The transport factory service.
+   *
+   * @var \Drupal\swiftmailer\TransportFactoryInterface
+   */
+  protected $transportFactory;
+
+  /**
    * SwiftMailer constructor.
    *
-   * @param \Drupal\Core\Config\ImmutableConfig $transport
+   * @param \Drupal\swiftmailer\TransportFactoryInterface $transport_factory
+   *   The transport factory service.
    * @param \Drupal\Core\Config\ImmutableConfig $message
+   *   The swiftmailer message configuration.
    * @param \Psr\Log\LoggerInterface $logger
+   *   A logger instance.
    * @param \Drupal\Core\Render\RendererInterface $renderer
+   *   The renderer.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   *   The module handler.
    */
-  public function __construct(ImmutableConfig $transport, ImmutableConfig $message, LoggerInterface $logger, RendererInterface $renderer, ModuleHandlerInterface $module_handler) {
-    $this->config['transport'] = $transport->get();
+  public function __construct(TransportFactoryInterface $transport_factory, ImmutableConfig $message, LoggerInterface $logger, RendererInterface $renderer, ModuleHandlerInterface $module_handler) {
+    $this->transportFactory = $transport_factory;
     $this->config['message'] = $message->get();
     $this->logger = $logger;
     $this->renderer = $renderer;
@@ -84,7 +99,7 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
     return new static(
-      $container->get('config.factory')->get('swiftmailer.transport'),
+      $container->get('swiftmailer.transport'),
       $container->get('config.factory')->get('swiftmailer.message'),
       $container->get('logger.factory')->get('swiftmailer'),
       $container->get('renderer'),
@@ -293,97 +308,8 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
       }
 
       // Get the configured transport type.
-      $transport_type = $this->config['transport']['transport'];
-
-      // Configure the mailer based on the configured transport type.
-      switch ($transport_type) {
-        case SWIFTMAILER_TRANSPORT_SMTP:
-          // Get transport configuration.
-          $host = $this->config['transport']['smtp_host'];
-          $port = $this->config['transport']['smtp_port'];
-          $encryption = $this->config['transport']['smtp_encryption'];
-          $provider =  $this->config['transport']['smtp_credential_provider'];
-          $username = NULL;
-          $password = NULL;
-          if ($provider === 'swiftmailer') {
-            $username = $this->config['transport']['smtp_credentials']['swiftmailer']['username'];
-            $password = $this->config['transport']['smtp_credentials']['swiftmailer']['password'];
-          }
-          elseif ($provider === 'key') {
-            /** @var \Drupal\Core\Entity\EntityStorageInterface $storage */
-            $storage = \Drupal::entityTypeManager()->getStorage('key');
-            /** @var \Drupal\key\KeyInterface $username_key */
-            $username_key = $storage->load($this->config['transport']['smtp_credentials']['key']['username']);
-            if ($username_key) {
-              $username = $username_key->getKeyValue();
-            }
-            /** @var \Drupal\key\KeyInterface $password_key */
-            $password_key = $storage->load($this->config['transport']['smtp_credentials']['key']['password']);
-            if ($password_key) {
-              $password = $password_key->getKeyValue();
-            }
-          }
-          elseif ($provider == 'multikey') {
-            /** @var \Drupal\Core\Entity\EntityStorageInterface $storage */
-            $storage = \Drupal::entityTypeManager()->getStorage('key');
-            /** @var \Drupal\key\KeyInterface $username_key */
-            $user_password_key = $storage->load($this->config['transport']['smtp_credentials']['multikey']['user_password']);
-            if ($user_password_key) {
-              $values = $user_password_key->getKeyValues();
-              $username = $values['username'];
-              $password = $values['password'];
-            }
-          }
-
-          // Instantiate transport.
-          $transport = Swift_SmtpTransport::newInstance($host, $port);
-          $transport->setLocalDomain('[127.0.0.1]');
-
-          // Set encryption (if any).
-          if (!empty($encryption)) {
-            $transport->setEncryption($encryption);
-          }
-
-          // Set username (if any).
-          if (!empty($username)) {
-            $transport->setUsername($username);
-          }
-
-          // Set password (if any).
-          if (!empty($password)) {
-            $transport->setPassword($password);
-          }
-          break;
-
-        case SWIFTMAILER_TRANSPORT_SENDMAIL:
-          // Get transport configuration.
-          $path = $this->config['transport']['sendmail_path'];
-          $mode = $this->config['transport']['sendmail_mode'];
-
-          // Instantiate transport.
-          $transport = Swift_SendmailTransport::newInstance($path . ' -' . $mode);
-          break;
-
-        case SWIFTMAILER_TRANSPORT_NATIVE:
-          // Instantiate transport.
-          $transport = Swift_MailTransport::newInstance();
-          break;
-
-        case SWIFTMAILER_TRANSPORT_SPOOL:
-          // Instantiate transport.
-          $spooldir = $this->config['transport']['spool_directory'];
-          $spool = new Swift_FileSpool($spooldir);
-          $transport = Swift_SpoolTransport::newInstance($spool);
-          break;
-
-        case SWIFTMAILER_TRANSPORT_NULL:
-          $transport = Swift_NullTransport::newInstance();
-          break;
-      }
-
-      if (!isset($transport)) {
-        throw new \LogicException('The transport method is undefined.');
-      }
+      $transport_type = $this->transportFactory->getDefaultTransportMethod();
+      $transport = $this->transportFactory->getTransport($transport_type);
 
       $mailer = Swift_Mailer::newInstance($transport);
 
