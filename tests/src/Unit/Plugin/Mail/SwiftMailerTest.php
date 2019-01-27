@@ -5,12 +5,15 @@ namespace Drupal\Tests\swiftmailer\Unit\Plugin\Mail;
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Render\Markup;
 use Drupal\swiftmailer\Plugin\Mail\SwiftMailer;
+use PHPUnit\Framework\TestCase;
+
+define('SWIFTMAILER_FORMAT_HTML', 'text/html');
 
 /**
  * @coversDefaultClass \Drupal\swiftmailer\Plugin\Mail\SwiftMailer
  * @group swiftmailer
  */
-class SwiftMailerTest extends \PHPUnit_Framework_TestCase {
+class SwiftMailerTest extends TestCase {
 
   /**
    * @covers ::massageMessageBody
