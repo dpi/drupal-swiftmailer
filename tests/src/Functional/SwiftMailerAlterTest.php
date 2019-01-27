@@ -3,7 +3,6 @@
 namespace Drupal\Tests\swiftmailer\Functional;
 
 use Drupal;
-use Drupal\Core\Test\AssertMailTrait;
 use Drupal\swiftmailer_test\SwiftMailerDrupalStateLogger;
 use Drupal\Tests\BrowserTestBase;
 

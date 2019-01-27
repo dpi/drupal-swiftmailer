@@ -4,7 +4,6 @@ namespace Drupal\swiftmailer\Plugin\Mail;
 
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Component\Utility\Html;
-use Drupal\Component\Utility\Unicode;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Config\ImmutableConfig;
 use Drupal\Core\Extension\ModuleHandlerInterface;
@@ -154,8 +153,8 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
       $image_path = trim($embeddable_images[1][$i]);
       $image_name = basename($image_path);
 
-      if (Unicode::substr($image_path, 0, 1) == '/') {
-        $image_path = Unicode::substr($image_path, 1);
+      if (mb_substr($image_path, 0, 1) == '/') {
+        $image_path = mb_substr($image_path, 1);
       }
 
       $image = new \stdClass();
@@ -545,7 +544,7 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
     $message['body'] = Markup::create(implode($line_endings, array_map(function ($body) use ($applicable_format, $filter_format) {
       // If the body contains no html tags but the applicable format is HTML,
       // we can assume newlines will need be converted to <br>.
-      if ($applicable_format == SWIFTMAILER_FORMAT_HTML && Unicode::strlen(strip_tags($body)) === Unicode::strlen($body)) {
+      if ($applicable_format == SWIFTMAILER_FORMAT_HTML && mb_strlen(strip_tags($body)) === mb_strlen($body)) {
         // The default fallback format is 'plain_text', which escapes markup,
         // converts new lines to <br> and converts URLs to links.
         $build = [

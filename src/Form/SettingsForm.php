@@ -6,8 +6,8 @@ use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Url;
-use Drupal\key\KeyInterface;
 use Drupal\key\Entity\Key;
+use Drupal\key\KeyInterface;
 
 /**
  * Swift Mailer settings form.
