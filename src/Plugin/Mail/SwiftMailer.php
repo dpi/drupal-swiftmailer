@@ -186,7 +186,7 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
     try {
 
       // Create a new message.
-      $m = Swift_Message::newInstance();
+      $m = Swift_Message::newInstance($message['subject']);
 
       // Not all Drupal headers should be added to the e-mail message.
       // Some headers must be suppressed in order for Swift Mailer to
@@ -249,22 +249,10 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
         }
       }
 
-      // Set basic message details.
-      Conversion::swiftmailer_remove_header($m, 'From');
-      Conversion::swiftmailer_remove_header($m, 'Reply-To');
-      Conversion::swiftmailer_remove_header($m, 'To');
-      Conversion::swiftmailer_remove_header($m, 'Subject');
-
-      // Parse 'from', 'to' and 'reply-to' mailboxes.
-      $from = Conversion::swiftmailer_parse_mailboxes($message['from']);
-      $to = Conversion::swiftmailer_parse_mailboxes($message['to']);
-      $reply_to = !empty($message['reply-to']) ? Conversion::swiftmailer_parse_mailboxes($message['reply-to']) : $from;
-
-      // Set 'from', 'reply-to', 'to' and 'subject' headers.
-      $m->setFrom($from);
-      $m->setReplyTo($reply_to);
-      $m->setTo($to);
-      $m->setSubject($message['subject']);
+      // \Drupal\Core\Mail\Plugin\Mail\PhpMail respects $message['to'] but for
+      // 'from' and 'reply-to' it uses the headers (which are set in
+      // MailManager::doMail). Replicate that behavior here.
+      Conversion::swiftmailer_add_mailbox_header($m, 'To', $message['to']);
 
       // Get applicable format.
       $applicable_format = $this->getApplicableFormat($message);
