@@ -8,12 +8,11 @@ use Drupal\swiftmailer_test\SwiftMailerDrupalStateLogger;
  * @see \Drupal\swiftmailer\Plugin\Mail\SwiftMailer::mail
  */
 function swiftmailer_test_swiftmailer_alter(Swift_Mailer &$swiftMailer, Swift_Message &$swiftMessage, &$message) {
-  if ($message['key'] == 'test_1') {
-    $swiftMessage->setBody('Replace text in swiftmailer_test_swiftmailer_alter');
+  if ($message['module'] === 'swiftmailer_test') {
     $swiftMailer->registerPlugin(new SwiftMailerDrupalStateLogger());
   }
-  if ($message['key'] == 'test-2') {
-    $swiftMailer->registerPlugin(new SwiftMailerDrupalStateLogger());
+  if ($message['key'] == 'test_1') {
+    $swiftMessage->setBody('Replace text in swiftmailer_test_swiftmailer_alter');
   }
 }
 

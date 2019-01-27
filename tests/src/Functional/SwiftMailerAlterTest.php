@@ -68,4 +68,102 @@ class SwiftMailerAlterTest extends BrowserTestBase {
     $this->assertContains('variable_from_preprocess', (string) $this->logger->dump()[0]['body']);
   }
 
+  /**
+   * Create plain text version from body.
+   */
+  public function testGeneratePlainTextVersion() {
+    $plugin = Drupal\swiftmailer\Plugin\Mail\SwiftMailer::create(\Drupal::getContainer(), [], NULL, NULL);
+
+    $message = [
+      'module' => 'swiftmailer_test',
+      'key' => 'swiftmailer_test_1',
+      'headers' => [
+        'Content-Type' => SWIFTMAILER_FORMAT_HTML,
+      ],
+      'params' => [
+        'convert' => TRUE,
+      ],
+      'subject' => 'Subject',
+      'body' => [
+        Drupal\Core\Render\Markup::create('<strong>Hello World</strong>')
+      ]
+    ];
+
+    $message = $plugin->format($message);
+    $this->assertContains('<strong>Hello World</strong>', (string) $message['body']);
+    $this->assertContains('HELLO WORLD', $message['plain']);
+  }
+
+  /**
+   * Preserve original plain text, do not generate it from body.
+   */
+  public function testKeepOriginalPlainTextVersion() {
+    $plugin = Drupal\swiftmailer\Plugin\Mail\SwiftMailer::create(\Drupal::getContainer(), [], NULL, NULL);
+
+    $message = [
+      'module' => 'swiftmailer_test',
+      'key' => 'swiftmailer_test_1',
+      'headers' => [
+        'Content-Type' => SWIFTMAILER_FORMAT_HTML,
+      ],
+      'params' => [
+        'convert' => FALSE,
+      ],
+      'subject' => 'Subject',
+      'plain' => 'Original Plain Text Version',
+      'body' => [
+        Drupal\Core\Render\Markup::create('<strong>Hello World</strong>')
+      ]
+    ];
+
+    $message = $plugin->format($message);
+    $this->assertContains('<strong>Hello World</strong>', (string) $message['body']);
+    $this->assertContains('Original Plain Text Version', $message['plain']);
+  }
+
+  public function testPlainTextConfigurationSetting() {
+    \Drupal::configFactory()
+      ->getEditable('swiftmailer.message')
+      ->set('convert_mode', TRUE)
+      ->save();
+
+    $plugin = Drupal\swiftmailer\Plugin\Mail\SwiftMailer::create(\Drupal::getContainer(), [], NULL, NULL);
+
+    // Empty plain text, generate from html.
+    $message = [
+      'module' => 'swiftmailer_test',
+      'key' => 'swiftmailer_test_1',
+      'headers' => [
+        'Content-Type' => SWIFTMAILER_FORMAT_HTML,
+      ],
+      'subject' => 'Subject',
+      'body' => [
+        Drupal\Core\Render\Markup::create('<strong>Hello World</strong>')
+      ]
+    ];
+
+    $message = $plugin->format($message);
+    $this->assertContains('<strong>Hello World</strong>', (string) $message['body']);
+    $this->assertContains('HELLO WORLD', $message['plain']);
+
+    // Keep original plain text version.
+    $message = [
+      'module' => 'swiftmailer_test',
+      'key' => 'swiftmailer_test_1',
+      'headers' => [
+        'Content-Type' => SWIFTMAILER_FORMAT_HTML,
+      ],
+      'subject' => 'Subject',
+      'plain' => 'Original Plain Text Version',
+      'body' => [
+        Drupal\Core\Render\Markup::create('<strong>Hello World</strong>')
+      ]
+    ];
+
+    $message = $plugin->format($message);
+    $this->assertContains('<strong>Hello World</strong>', (string) $message['body']);
+    $this->assertContains('Original Plain Text Version', $message['plain']);
+  }
+
+
 }
