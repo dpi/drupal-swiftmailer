@@ -12,4 +12,14 @@ function swiftmailer_test_swiftmailer_alter(Swift_Mailer &$swiftMailer, Swift_Me
     $swiftMessage->setBody('Replace text in swiftmailer_test_swiftmailer_alter');
     $swiftMailer->registerPlugin(new SwiftMailerDrupalStateLogger());
   }
+  if ($message['key'] == 'test-2') {
+    $swiftMailer->registerPlugin(new SwiftMailerDrupalStateLogger());
+  }
+}
+
+/**
+ * Implements template_preprocess_swiftmailer().
+ */
+function swiftmailer_test_preprocess_swiftmailer__swiftmailer_test__test_2(&$variables, $hook) {
+  $variables['variable_from_preprocess'] = 'variable_from_preprocess';
 }
