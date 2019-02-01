@@ -64,7 +64,6 @@ class SettingsForm extends ConfigFormBase {
       '#options' => [
         SWIFTMAILER_TRANSPORT_SMTP => $this->t('SMTP'),
         SWIFTMAILER_TRANSPORT_SENDMAIL => $this->t('Sendmail'),
-        SWIFTMAILER_TRANSPORT_NATIVE => $this->t('PHP'),
         SWIFTMAILER_TRANSPORT_SPOOL => $this->t('Spool'),
       ],
       '#default_value' => $transport,
@@ -246,24 +245,6 @@ class SettingsForm extends ConfigFormBase {
       '#default_value' => $config->get('sendmail_mode'),
     ];
 
-    $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_NATIVE] = [
-      '#type' => 'item',
-      '#access' => $form['transport']['type']['#default_value'] == SWIFTMAILER_TRANSPORT_NATIVE,
-    ];
-
-    $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_NATIVE]['title'] = [
-      '#markup' => '<h3>' . $this->t('PHP transport options') . '</h3>',
-    ];
-
-    $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_NATIVE]['description'] = [
-      '#markup' => '<p>' . $this->t('This transport type will send all e-mails using the built-in
-      mail functionality of PHP. This transport type can not be
-      configured here. Please refer to the @documentation if you
-      would like to read more about how the built-in mail functionality
-      in PHP can be configured.',
-          ['@documentation' => Link::fromTextAndUrl($this->t('PHP documentation'), Url::fromUri('http://www.php.net/manual/en/mail.configuration.php'))->toString()]) . '</p>',
-    ];
-
     $form['transport']['configuration'][SWIFTMAILER_TRANSPORT_SPOOL] = [
       '#type' => 'item',
       '#access' => $form['transport']['type']['#default_value'] == SWIFTMAILER_TRANSPORT_SPOOL,
@@ -336,11 +317,6 @@ class SettingsForm extends ConfigFormBase {
           $config->set('sendmail_mode', $form_state->getValue(['transport', 'configuration', SWIFTMAILER_TRANSPORT_SENDMAIL, 'mode']));
           $config->save();
           $messenger->addStatus($this->t('Drupal has been configured to send all e-mails using the Sendmail transport type.'));
-          break;
-
-        case SWIFTMAILER_TRANSPORT_NATIVE:
-          $config->save();
-          $messenger->addStatus($this->t('Drupal has been configured to send all e-mails using the PHP transport type.'));
           break;
 
         case SWIFTMAILER_TRANSPORT_SPOOL:

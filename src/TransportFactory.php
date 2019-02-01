@@ -4,9 +4,9 @@ namespace Drupal\swiftmailer;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Swift_FileSpool;
-use Swift_MailTransport;
 use Swift_NullTransport;
 use Swift_SendmailTransport;
+use Swift_SmtpTransport;
 use Swift_SpoolTransport;
 
 /**
@@ -83,7 +83,7 @@ class TransportFactory implements TransportFactoryInterface {
         }
 
         // Instantiate transport.
-        $transport = \Swift_SmtpTransport::newInstance($host, $port);
+        $transport = new Swift_SmtpTransport($host, $port);
         $transport->setLocalDomain('[127.0.0.1]');
 
         // Set encryption (if any).
@@ -108,23 +108,18 @@ class TransportFactory implements TransportFactoryInterface {
         $mode = $this->transportConfig->get('sendmail_mode');
 
         // Instantiate transport.
-        $transport = Swift_SendmailTransport::newInstance($path . ' -' . $mode);
-        break;
-
-      case SWIFTMAILER_TRANSPORT_NATIVE:
-        // Instantiate transport.
-        $transport = Swift_MailTransport::newInstance();
+        $transport = new Swift_SendmailTransport($path . ' -' . $mode);
         break;
 
       case SWIFTMAILER_TRANSPORT_SPOOL:
         // Instantiate transport.
         $spooldir = $this->transportConfig->get('spool_directory');
         $spool = new Swift_FileSpool($spooldir);
-        $transport = Swift_SpoolTransport::newInstance($spool);
+        $transport = new Swift_SpoolTransport($spool);
         break;
 
       case SWIFTMAILER_TRANSPORT_NULL:
-        $transport = Swift_NullTransport::newInstance();
+        $transport = new Swift_NullTransport();
         break;
     }
 

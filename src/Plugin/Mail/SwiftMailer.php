@@ -185,7 +185,7 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
     try {
 
       // Create a new message.
-      $m = Swift_Message::newInstance($message['subject']);
+      $m = new Swift_Message($message['subject']);
 
       // Not all Drupal headers should be added to the e-mail message.
       // Some headers must be suppressed in order for Swift Mailer to
@@ -298,7 +298,7 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
       $transport_type = $this->transportFactory->getDefaultTransportMethod();
       $transport = $this->transportFactory->getTransport($transport_type);
 
-      $mailer = Swift_Mailer::newInstance($transport);
+      $mailer = new Swift_Mailer($transport);
 
       // Allows other modules to customize the message.
       $this->moduleHandler->alter('swiftmailer', $mailer, $m, $message);
@@ -353,7 +353,7 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
         $filemime = $file->filemime;
 
         // Attach file.
-        $m->attach(Swift_Attachment::newInstance($content, $filename, $filemime));
+        $m->attach(new Swift_Attachment($content, $filename, $filemime));
       }
     }
 
@@ -390,7 +390,7 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
           $this->attach($m, [$file]);
         }
         else {
-          $m->attach(Swift_Attachment::newInstance($a['filecontent'], $a['filename'], $a['filemime']));
+          $m->attach(new Swift_Attachment($a['filecontent'], $a['filename'], $a['filemime']));
         }
       }
     }
@@ -432,7 +432,7 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
         $filemime = $image->filemime;
 
         // Embed image.
-        $cid = $m->embed(Swift_Image::newInstance($content, $filename, $filemime));
+        $cid = $m->embed(new Swift_Image($content, $filename, $filemime));
 
         // The provided 'cid' needs to be replaced with the 'cid' returned
         // by the Swift Mailer library.
