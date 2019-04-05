@@ -7,6 +7,7 @@ use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Config\ImmutableConfig;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Mail\MailFormatHelper;
 use Drupal\Core\Mail\MailInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Render\Markup;
@@ -555,7 +556,7 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
         $body = $this->renderer->renderPlain($build);
       }
       // If $item is not marked safe then it will be escaped.
-      return $body instanceof MarkupInterface ? $body : Html::escape($body);
+      return $body instanceof MarkupInterface ? $body : MailFormatHelper::htmlToText($body);
     }, $message['body'])));
     return $message;
   }
