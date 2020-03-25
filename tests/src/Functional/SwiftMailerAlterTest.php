@@ -2,7 +2,8 @@
 
 namespace Drupal\Tests\swiftmailer\Functional;
 
-use Drupal;
+use Drupal\Core\Render\Markup;
+use Drupal\swiftmailer\Plugin\Mail\SwiftMailer;
 use Drupal\swiftmailer_test\SwiftMailerDrupalStateLogger;
 use Drupal\Tests\BrowserTestBase;
 
@@ -20,15 +21,13 @@ class SwiftMailerAlterTest extends BrowserTestBase {
 
   protected function setUp() {
     parent::setUp();
-    Drupal::configFactory()
-      ->getEditable('mailsystem.settings')
+    $this->config('mailsystem.settings')
       ->set('modules.swiftmailer_test.none', [
         'formatter' => 'swiftmailer',
         'sender' => 'swiftmailer',
       ])
       ->save();
-    Drupal::configFactory()
-      ->getEditable('swiftmailer.transport')
+    $this->config('swiftmailer.transport')
       ->set('transport', 'null')
       ->save();
     $this->logger = new SwiftMailerDrupalStateLogger();
@@ -71,7 +70,7 @@ class SwiftMailerAlterTest extends BrowserTestBase {
    * Create plain text version from body.
    */
   public function testGeneratePlainTextVersion() {
-    $plugin = Drupal\swiftmailer\Plugin\Mail\SwiftMailer::create(\Drupal::getContainer(), [], NULL, NULL);
+    $plugin = SwiftMailer::create(\Drupal::getContainer(), [], NULL, NULL);
 
     $message = [
       'module' => 'swiftmailer_test',
@@ -84,7 +83,7 @@ class SwiftMailerAlterTest extends BrowserTestBase {
       ],
       'subject' => 'Subject',
       'body' => [
-        Drupal\Core\Render\Markup::create('<strong>Hello World</strong>')
+        Markup::create('<strong>Hello World</strong>')
       ]
     ];
 
@@ -97,7 +96,7 @@ class SwiftMailerAlterTest extends BrowserTestBase {
    * Preserve original plain text, do not generate it from body.
    */
   public function testKeepOriginalPlainTextVersion() {
-    $plugin = Drupal\swiftmailer\Plugin\Mail\SwiftMailer::create(\Drupal::getContainer(), [], NULL, NULL);
+    $plugin = SwiftMailer::create(\Drupal::getContainer(), [], NULL, NULL);
 
     $message = [
       'module' => 'swiftmailer_test',
@@ -111,7 +110,7 @@ class SwiftMailerAlterTest extends BrowserTestBase {
       'subject' => 'Subject',
       'plain' => 'Original Plain Text Version',
       'body' => [
-        Drupal\Core\Render\Markup::create('<strong>Hello World</strong>')
+        Markup::create('<strong>Hello World</strong>')
       ]
     ];
 
@@ -126,7 +125,7 @@ class SwiftMailerAlterTest extends BrowserTestBase {
       ->set('convert_mode', TRUE)
       ->save();
 
-    $plugin = Drupal\swiftmailer\Plugin\Mail\SwiftMailer::create(\Drupal::getContainer(), [], NULL, NULL);
+    $plugin = SwiftMailer::create(\Drupal::getContainer(), [], NULL, NULL);
 
     // Empty plain text, generate from html.
     $message = [
@@ -137,7 +136,7 @@ class SwiftMailerAlterTest extends BrowserTestBase {
       ],
       'subject' => 'Subject',
       'body' => [
-        Drupal\Core\Render\Markup::create('<strong>Hello World</strong>')
+        Markup::create('<strong>Hello World</strong>')
       ]
     ];
 
@@ -155,7 +154,7 @@ class SwiftMailerAlterTest extends BrowserTestBase {
       'subject' => 'Subject',
       'plain' => 'Original Plain Text Version',
       'body' => [
-        Drupal\Core\Render\Markup::create('<strong>Hello World</strong>')
+        Markup::create('<strong>Hello World</strong>')
       ]
     ];
 
