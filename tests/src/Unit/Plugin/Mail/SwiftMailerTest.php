@@ -35,7 +35,7 @@ class SwiftMailerTest extends TestCase {
 
     $result = [
       'Hello World',
-      'Hello &lt;strong&gt;World&lt;/strong&gt;',
+      "\nHello *World*\n",
       'Hello World #2',
       'Hello <strong>World</strong>',
     ];
