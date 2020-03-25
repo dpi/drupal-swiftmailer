@@ -1,5 +1,6 @@
 name: 'Test theme for SwiftMailer'
 type: theme
 description: 'Support theme for testing SwiftMailer'
-version: VERSION
+base theme: stable
 core: 8.x
+core_version_requirement: ^8 || ^9

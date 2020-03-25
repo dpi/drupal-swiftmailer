@@ -12,6 +12,11 @@ use Drupal\Tests\BrowserTestBase;
  */
 class SwiftMailerAlterTest extends BrowserTestBase {
 
+  /**
+   * {@inheritdoc}
+   */
+  protected $defaultTheme = 'stark';
+
   public static $modules = ['swiftmailer_test', 'swiftmailer', 'mailsystem'];
 
   /**
