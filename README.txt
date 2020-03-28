@@ -24,8 +24,8 @@ Please go to 'admin/config/swiftmailer/transport' to configure the Swift Mailer
 module.
 
 The module requires you to download the Swift Mailer library with composer. You
-should require the module itself with composer. Please the the documentation on
-Drupal.org for further information on this topic.
+should require the module itself with composer. Please refer to the
+documentation on Drupal.org for further information on this topic.
 
 https://www.drupal.org/docs/develop/using-composer/using-composer-to-manage-drupal-site-dependencies#managing-contributed
 
