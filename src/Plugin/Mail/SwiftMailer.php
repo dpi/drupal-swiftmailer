@@ -317,7 +317,6 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
         message was returned : @exception_message<br /><br />The e-mail carried
         the following headers:<br /><br />@headers',
         ['@exception_message' => $e->getMessage(), '@headers' => $headers]);
-      \Drupal::messenger()->addError(t('An attempt to send an e-mail message failed.'));
     }
     return FALSE;
   }
