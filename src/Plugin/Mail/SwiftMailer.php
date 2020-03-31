@@ -4,6 +4,7 @@ namespace Drupal\swiftmailer\Plugin\Mail;
 
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Component\Utility\Html;
+use Drupal\Component\Utility\Random;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Asset\AssetResolverInterface;
 use Drupal\Core\Asset\AttachedAssets;
@@ -199,10 +200,10 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
       }
     }
 
-    // Process any images specified by 'image:' which are to be added later
-    // in the process. All we do here is to alter the message so that image
-    // paths are replaced with cid's. Each image gets added to the array
-    // which keeps track of which images to embed in the e-mail.
+    // We replace all 'image:foo' in the body with a unique magic string like
+    // 'cid:[randomname]' and keep track of this. It will be replaced by the
+    // final "cid" in ::embed().
+    $random = new Random();
     $embeddable_images = [];
     $processed_images = [];
     preg_match_all('/"image:([^"]+)"/', $message['body'], $embeddable_images);
@@ -222,7 +223,7 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
       $image->uri = $image_path;
       $image->filename = $image_name;
       $image->filemime = \Drupal::service('file.mime_type.guesser')->guess($image_path);
-      $image->cid = rand(0, 9999999999);
+      $image->cid = $random->name(8, TRUE);
       $message['params']['images'][] = $image;
       $message['body'] = preg_replace($image_id, 'cid:' . $image->cid, $message['body']);
       $processed_images[$image_id] = 1;
