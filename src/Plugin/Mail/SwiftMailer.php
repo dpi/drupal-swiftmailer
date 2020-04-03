@@ -110,8 +110,6 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
   /**
    * Formats a message composed by drupal_mail().
    *
-   * @see http://api.drupal.org/api/drupal/includes--mail.inc/interface/MailSystemInterface/7
-   *
    * @param array $message
    *   A message array holding all relevant details for the message.
    *
@@ -173,8 +171,6 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
 
   /**
    * Sends a message composed by drupal_mail().
-   *
-   * @see http://api.drupal.org/api/drupal/includes--mail.inc/interface/MailSystemInterface/7
    *
    * @param array $message
    *   A message array holding all relevant details for the message.
@@ -299,6 +295,7 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
       $transport_type = $this->transportFactory->getDefaultTransportMethod();
       $transport = $this->transportFactory->getTransport($transport_type);
 
+      /** @var \Swift_Mailer $mailer */
       $mailer = new Swift_Mailer($transport);
 
       // Allows other modules to customize the message.
@@ -306,7 +303,6 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
 
       // Send the message.
       Conversion::swiftmailer_filter_message($m);
-      /** @var Swift_Mailer $mailer */
       return (bool) $mailer->send($m);
     }
     catch (Exception $e) {
@@ -452,7 +448,7 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
    * @return string
    *   A string being the applicable format.
    */
-  private function getApplicableFormat($message) {
+  private function getApplicableFormat(array $message) {
     // Get the configured default format.
     $default_format = $this->config['message']['format'];
 
@@ -492,7 +488,7 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
    * @return string
    *   A string being the applicable charset.
    */
-  private function getApplicableCharset($message) {
+  private function getApplicableCharset(array $message) {
 
     // Get the configured default format.
     $default_charset = $this->config['message']['character_set'];
@@ -533,6 +529,7 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
    *   The message.
    *
    * @return array
+   *   The render array for message body.
    */
   public function massageMessageBody(array $message) {
     // Get default mail line endings and merge all lines in the e-mail body
