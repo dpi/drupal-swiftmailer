@@ -10,7 +10,7 @@ use Drupal\KernelTests\KernelTestBase;
  * @coversDefaultClass \Drupal\swiftmailer\Plugin\Mail\SwiftMailer
  * @group swiftmailer
  */
-class SwiftMailerTest extends KernelTestBase {
+class FormatTest extends KernelTestBase {
 
   /**
    * {@inheritdoc}
@@ -44,13 +44,17 @@ class SwiftMailerTest extends KernelTestBase {
   }
 
   /**
-   * Tests massaging the message body.
+   * Tests formatting the message.
    *
    * @dataProvider bodyDataProvider
    */
-  public function testMassageMessageBody(array $message, $expected, $expected_plain = NULL) {
+  public function testFormat(array $message, $expected, $expected_plain = NULL) {
+    $message['module'] = 'swiftmailer';
+    $message['key'] = 'FormatTest';
+    $message['subject'] = 'FormatTest';
+
     $message['params']['format'] = SWIFTMAILER_FORMAT_HTML;
-    $actual = $this->plugin->massageMessageBody($message);
+    $actual = $this->plugin->format($message);
     $this->assertSame(is_array($expected) ? implode(PHP_EOL, $expected) : $expected, (string) $actual['body']);
 
     if ($expected_plain) {
