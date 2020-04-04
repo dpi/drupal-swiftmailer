@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\swiftmailer\Kernel\Plugin\Mail;
 
+use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Render\Markup;
 use Drupal\KernelTests\KernelTestBase;
 
@@ -47,14 +48,20 @@ class SwiftMailerTest extends KernelTestBase {
    *
    * @dataProvider bodyDataProvider
    */
-  public function testMassageMessageBody(array $message, $expected) {
+  public function testMassageMessageBody(array $message, $expected, $expected_plain = NULL) {
     $message['params']['format'] = SWIFTMAILER_FORMAT_HTML;
     $actual = $this->plugin->massageMessageBody($message);
-    $this->assertSame($expected, (string) $actual['body']);
+    $this->assertSame(is_array($expected) ? implode(PHP_EOL, $expected) : $expected, (string) $actual['body']);
+
+    if ($expected_plain) {
+      $message['params']['format'] = SWIFTMAILER_FORMAT_PLAIN;
+      $actual = $this->plugin->massageMessageBody($message);
+      $this->assertSame(is_array($expected_plain) ? implode(PHP_EOL, $expected_plain) : $expected_plain, (string) $actual['body']);
+    }
   }
 
   /**
-   * Data provider of body data with markup and without HTML markup.
+   * Data provider of body data.
    */
   public function bodyDataProvider() {
     return [
@@ -76,6 +83,19 @@ class SwiftMailerTest extends KernelTestBase {
           ],
         ],
         'expected' => "<p>Lorem ipsum dolor sit amet<br />\nconsetetur sadipscing elitr<br />\nsed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat<br />\nsed diam voluptua.</p>\n",
+      ],
+      'mixed' => [
+        'message' => [
+          'body' => [
+            'Hello World',
+            'Hello <strong>World</strong>',
+            new FormattableMarkup('Hello World #@number', ['@number' => 2]),
+            Markup::create('Hello <strong>World</strong>'),
+          ],
+        ],
+        // Output is wrong due to https://www.drupal.org/project/swiftmailer/issues/3122389.
+        'expected' => ["<p>Hello World</p>\n", "Hello *World*\n", "<p>Hello World #2</p>\n", "Hello <strong>World</strong>"],
+        'expected_plain' => ["Hello World\n", "Hello *World*\n", "Hello World #2", "Hello <strong>World</strong>"],
       ],
     ];
   }
