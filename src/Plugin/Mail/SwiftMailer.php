@@ -5,6 +5,8 @@ namespace Drupal\swiftmailer\Plugin\Mail;
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\UrlHelper;
+use Drupal\Core\Asset\AssetResolverInterface;
+use Drupal\Core\Asset\AttachedAssets;
 use Drupal\Core\Config\ImmutableConfig;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Mail\MailFormatHelper;
@@ -13,7 +15,6 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Site\Settings;
-use Drupal\key\KeyInterface;
 use Drupal\swiftmailer\TransportFactoryInterface;
 use Drupal\swiftmailer\Utility\Conversion;
 use Exception;
@@ -25,6 +26,10 @@ use Swift_Image;
 use Swift_Mailer;
 use Swift_Message;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
+use Drupal\Core\Theme\ThemeManagerInterface;
+use Drupal\Core\Mail\MailManagerInterface;
+use Drupal\mailsystem\MailsystemManager;
 
 /**
  * Provides a 'Swift Mailer' plugin to send emails.
@@ -73,6 +78,27 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
   protected $transportFactory;
 
   /**
+   * The mail manager.
+   *
+   * @var \Drupal\Core\Mail\MailManagerInterface
+   */
+  protected $mailManager;
+
+  /**
+   * The theme manager.
+   *
+   * @var \Drupal\Core\Theme\ThemeManagerInterface
+   */
+  protected $themeManager;
+
+  /**
+   * The asset resolver.
+   *
+   * @var \Drupal\Core\Asset\AssetResolverInterface
+   */
+  protected $assetResolver;
+
+  /**
    * SwiftMailer constructor.
    *
    * @param \Drupal\swiftmailer\TransportFactoryInterface $transport_factory
@@ -85,13 +111,22 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
    *   The renderer.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
+   * @param \Drupal\Core\Mail\MailManagerInterface $mail_manager
+   *   The mail manager.
+   * @param \Drupal\Core\Theme\ThemeManagerInterface $theme_manager
+   *   The theme manager.
+   * @param \Drupal\Core\Asset\AssetResolverInterface $asset_resolver
+   *   The asset resolver.
    */
-  public function __construct(TransportFactoryInterface $transport_factory, ImmutableConfig $message, LoggerInterface $logger, RendererInterface $renderer, ModuleHandlerInterface $module_handler) {
+  public function __construct(TransportFactoryInterface $transport_factory, ImmutableConfig $message, LoggerInterface $logger, RendererInterface $renderer, ModuleHandlerInterface $module_handler, MailManagerInterface $mail_manager, ThemeManagerInterface $theme_manager, AssetResolverInterface $asset_resolver) {
     $this->transportFactory = $transport_factory;
     $this->config['message'] = $message->get();
     $this->logger = $logger;
     $this->renderer = $renderer;
     $this->moduleHandler = $module_handler;
+    $this->mailManager = $mail_manager;
+    $this->themeManager = $theme_manager;
+    $this->assetResolver = $asset_resolver;
   }
 
   /**
@@ -103,7 +138,10 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
       $container->get('config.factory')->get('swiftmailer.message'),
       $container->get('logger.factory')->get('swiftmailer'),
       $container->get('renderer'),
-      $container->get('module_handler')
+      $container->get('module_handler'),
+      $container->get('plugin.manager.mail'),
+      $container->get('theme.manager'),
+      $container->get('asset.resolver')
     );
   }
 
@@ -124,9 +162,20 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
 
     // Theme message if format is set to be HTML.
     if ($applicable_format == SWIFTMAILER_FORMAT_HTML) {
+      // Attempt to use the mail theme defined in MailSystem.
+      if ($this->mailManager instanceof MailsystemManager) {
+        $mail_theme = $this->mailManager->getMailTheme();
+      }
+      // Default to the active theme if MailsystemManager isn't used.
+      else {
+        $mail_theme = $this->themeManager->getActiveTheme()->getName();
+      }
       $render = [
         '#theme' => isset($message['params']['theme']) ? $message['params']['theme'] : 'swiftmailer',
         '#message' => $message,
+        '#attached' => [
+          'library' => ["$mail_theme/swiftmailer"],
+        ],
       ];
 
       $message['body'] = $this->renderer->renderPlain($render);
@@ -134,6 +183,19 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
       if (empty($message['plain']) && $this->config['message']['convert_mode'] || !empty($message['params']['convert'])) {
         $converter = new Html2Text($message['body']);
         $message['plain'] = $converter->getText();
+      }
+
+      // Process CSS from libraries.
+      $assets = AttachedAssets::createFromRenderArray($render);
+      $css = '';
+      // Request optimization so that the CssOptimizer performs essential
+      // processing such as @include.
+      foreach ($this->assetResolver->getCssAssets($assets, TRUE) as $css_asset) {
+        $css .= file_get_contents($css_asset['data']);
+      }
+
+      if ($css) {
+        $message['body'] = (new CssToInlineStyles())->convert($message['body'], $css);
       }
     }
 
