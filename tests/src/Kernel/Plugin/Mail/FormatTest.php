@@ -68,7 +68,7 @@ class FormatTest extends KernelTestBase {
 
     if ($expected_plain) {
       $message['params']['format'] = SWIFTMAILER_FORMAT_PLAIN;
-      $actual = $this->plugin->massageMessageBody($message);
+      $actual = $this->plugin->format($message);
       $expected_plain = implode(PHP_EOL, $expected_plain);
       $this->assertSame($expected_plain, (string) $actual['body']);
     }
