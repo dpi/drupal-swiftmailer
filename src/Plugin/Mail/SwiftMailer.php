@@ -607,17 +607,14 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
    * @internal
    */
   protected function massageMessageBody(array $message) {
-    // Get default mail line endings and merge all lines in the e-mail body
-    // separated by the mail line endings. Keep Markup objects and escape others
-    // and then treat the result as safe markup.
-    $line_endings = Settings::get('mail_line_endings', PHP_EOL);
     $applicable_format = $this->getApplicableFormat($message);
     $filter_format = $this->config['message']['filter_format'];
-    $message['body'] = Markup::create(implode($line_endings, array_map(function ($body) use ($applicable_format, $filter_format) {
-      // If the body contains no html tags but the applicable format is HTML,
-      // we can assume newlines will need be converted to <br>.
-      if ($applicable_format == SWIFTMAILER_FORMAT_HTML && mb_strlen(strip_tags($body)) === mb_strlen($body)) {
-        // The default fallback format is 'plain_text', which escapes markup,
+
+    foreach ($message['body'] as &$body) {
+      $is_markup = ($body instanceof MarkupInterface);
+
+      if (!$is_markup && ($applicable_format == SWIFTMAILER_FORMAT_HTML)) {
+        // Convert to HTML.  The default 'plain_text' format escapes markup,
         // converts new lines to <br> and converts URLs to links.
         $build = [
           '#type' => 'processed_text',
@@ -626,9 +623,19 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
         ];
         $body = $this->renderer->renderPlain($build);
       }
-      // If $item is not marked safe then it will be escaped.
-      return $body instanceof MarkupInterface ? $body : MailFormatHelper::htmlToText($body);
-    }, $message['body'])));
+
+      if ($is_markup && ($applicable_format == SWIFTMAILER_FORMAT_PLAIN)) {
+        // Convert to plain text.
+        $body = MailFormatHelper::htmlToText($body);
+      }
+    }
+
+    // Merge all lines in the e-mail body separated by the mail line endings.
+    // Treat the result as safe markup even for plain text format to prevent
+    // Twig auto-escape.
+    $line_endings = Settings::get('mail_line_endings', PHP_EOL);
+    $message['body'] = Markup::create(implode($line_endings, $message['body']));
+
     return $message;
   }
 

@@ -56,7 +56,7 @@ class FormatTest extends KernelTestBase {
    *
    * @dataProvider bodyDataProvider
    */
-  public function testFormat(array $message, $expected, $expected_plain = NULL) {
+  public function testFormat(array $message, $expected, $expected_plain) {
     $message['module'] = 'swiftmailer';
     $message['key'] = 'FormatTest';
     $message['subject'] = 'FormatTest';
@@ -66,12 +66,10 @@ class FormatTest extends KernelTestBase {
     $expected = implode(PHP_EOL, $expected) . PHP_EOL;
     $this->assertSame($expected, (string) $actual['body']);
 
-    if ($expected_plain) {
-      $message['params']['format'] = SWIFTMAILER_FORMAT_PLAIN;
-      $actual = $this->plugin->format($message);
-      $expected_plain = implode(PHP_EOL, $expected_plain);
-      $this->assertSame($expected_plain, (string) $actual['body']);
-    }
+    $message['params']['format'] = SWIFTMAILER_FORMAT_PLAIN;
+    $actual = $this->plugin->format($message);
+    $expected_plain = implode(PHP_EOL, $expected_plain);
+    $this->assertSame($expected_plain, (string) $actual['body']);
   }
 
   /**
@@ -91,10 +89,11 @@ class FormatTest extends KernelTestBase {
           "<p>consetetur &lt; sadipscing elitr</p>",
         ],
         'expected_plain' => [
-          "<p>Lorem ipsum &amp; dolor sit amet</p>",
-          "<p>consetetur &lt; sadipscing elitr</p>",
+          "Lorem ipsum & dolor sit amet\n\n",
+          "consetetur < sadipscing elitr\n\n",
         ],
       ],
+
       'no html' => [
         'message' => [
           'body' => [
@@ -102,28 +101,32 @@ class FormatTest extends KernelTestBase {
           ],
         ],
         'expected' => ["<p>Lorem ipsum &amp; dolor sit amet<br />\nconsetetur &lt; sadipscing elitr</p>\n"],
-        'expected_plain' => ["Lorem ipsum & dolor sit amet\nconsetetur < sadipscing elitr\n"],
+        'expected_plain' => ["Lorem ipsum & dolor sit amet\nconsetetur < sadipscing elitr"],
       ],
+
       'mixed' => [
         'message' => [
           'body' => [
             'Hello & World',
+            // Next, the content of the message contains strings that look like
+            // markup.  For example it could be a website lecturer explaining
+            // to students about the <strong> tag.
             'Hello & <strong>World</strong>',
             new FormattableMarkup('Hello &amp; World #@number', ['@number' => 2]),
             Markup::create('Hello &amp; <strong>World</strong>'),
           ],
         ],
-        // Output is wrong due to https://www.drupal.org/project/swiftmailer/issues/3122389.
         'expected' => [
           "<p>Hello &amp; World</p>\n",
-          "Hello & *World*\n",
-          "<p>Hello &amp;amp; World #2</p>\n", "Hello &amp; <strong>World</strong>",
-        ],
-        'expected_plain' => [
-          "Hello & World\n",
-          "Hello & *World*\n",
+          "<p>Hello &amp; &lt;strong&gt;World&lt;/strong&gt;</p>\n",
           "Hello &amp; World #2",
           "Hello &amp; <strong>World</strong>",
+        ],
+        'expected_plain' => [
+          "Hello & World",
+          "Hello & <strong>World</strong>",
+          "Hello & World #2\n",
+          "Hello & *World*\n",
         ],
       ],
     ];
