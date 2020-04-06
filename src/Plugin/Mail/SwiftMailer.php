@@ -387,8 +387,10 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
    *   The message which attachments are to be added to.
    * @param array $files
    *   The files which are to be added as attachments to the provided message.
+   *
+   * @internal
    */
-  private function attach(Swift_Message $m, array $files) {
+  protected function attach(Swift_Message $m, array $files) {
 
     // Iterate through each array element.
     foreach ($files as $file) {
@@ -425,8 +427,10 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
    *   The message which attachments are to be added to.
    * @param array $attachments
    *   The attachments which are to be added message.
+   *
+   * @internal
    */
-  private function attachAsMimeMail(Swift_Message $m, array $attachments) {
+  protected function attachAsMimeMail(Swift_Message $m, array $attachments) {
     // Iterate through each array element.
     foreach ($attachments as $a) {
       if (is_array($a)) {
@@ -463,8 +467,10 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
    * @param array $images
    *   The images which are to be added as inline images to the provided
    *   message.
+   *
+   * @internal
    */
-  private function embed(Swift_Message $m, array $images) {
+  protected function embed(Swift_Message $m, array $images) {
 
     // Iterate through each array element.
     foreach ($images as $image) {
@@ -510,8 +516,10 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
    *
    * @return string
    *   A string being the applicable format.
+   *
+   * @internal
    */
-  private function getApplicableFormat(array $message) {
+  protected function getApplicableFormat(array $message) {
     // Get the configured default format.
     $default_format = $this->config['message']['format'];
 
@@ -550,8 +558,10 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
    *
    * @return string
    *   A string being the applicable charset.
+   *
+   * @internal
    */
-  private function getApplicableCharset(array $message) {
+  protected function getApplicableCharset(array $message) {
 
     // Get the configured default format.
     $default_charset = $this->config['message']['character_set'];
@@ -593,8 +603,10 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
    *
    * @return array
    *   The render array for message body.
+   *
+   * @internal
    */
-  public function massageMessageBody(array $message) {
+  protected function massageMessageBody(array $message) {
     // Get default mail line endings and merge all lines in the e-mail body
     // separated by the mail line endings. Keep Markup objects and escape others
     // and then treat the result as safe markup.
