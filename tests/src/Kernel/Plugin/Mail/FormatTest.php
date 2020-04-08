@@ -63,13 +63,27 @@ class FormatTest extends KernelTestBase {
 
     $message['params']['format'] = SWIFTMAILER_FORMAT_HTML;
     $actual = $this->plugin->format($message);
-    $expected = implode(PHP_EOL, $expected) . PHP_EOL;
-    $this->assertSame($expected, (string) $actual['body']);
+    $expected = implode(PHP_EOL, $expected);
+    $this->assertSame($expected, $this->extractBody($actual));
 
     $message['params']['format'] = SWIFTMAILER_FORMAT_PLAIN;
     $actual = $this->plugin->format($message);
     $expected_plain = implode(PHP_EOL, $expected_plain);
     $this->assertSame($expected_plain, (string) $actual['body']);
+  }
+
+  /**
+   * Tests messages with CSS.
+   */
+  public function testCss() {
+    $message['module'] = 'swiftmailer';
+    $message['key'] = 'FormatTest';
+    $message['subject'] = 'FormatTest';
+    $message['params']['format'] = SWIFTMAILER_FORMAT_HTML;
+    $message['body'] = [Markup::create('<p class="red">Red text</p>')];
+    $expected = '<p class="red" style="color: red;">Red text</p>';
+    $actual = $this->plugin->format($message);
+    $this->assertSame($expected, $this->extractBody($actual));
   }
 
   /**
@@ -100,7 +114,7 @@ class FormatTest extends KernelTestBase {
             "Lorem ipsum & dolor sit amet\nconsetetur < sadipscing elitr",
           ],
         ],
-        'expected' => ["<p>Lorem ipsum &amp; dolor sit amet<br />\nconsetetur &lt; sadipscing elitr</p>\n"],
+        'expected' => ["<p>Lorem ipsum &amp; dolor sit amet<br>\nconsetetur &lt; sadipscing elitr</p>"],
         'expected_plain' => ["Lorem ipsum & dolor sit amet\nconsetetur < sadipscing elitr"],
       ],
 
@@ -130,6 +144,14 @@ class FormatTest extends KernelTestBase {
         ],
       ],
     ];
+  }
+
+  /**
+   * Returns the HTML body from a message (contents of <body> tag).
+   */
+  protected function extractBody($message) {
+    preg_match('|<html><body>(.*)</body></html>|s', $message['body'], $matches);
+    return trim($matches[1]);
   }
 
 }
