@@ -5,24 +5,11 @@ namespace Drupal\Tests\swiftmailer\Functional;
 use Drupal\Core\Render\Markup;
 use Drupal\swiftmailer\Plugin\Mail\SwiftMailer;
 use Drupal\swiftmailer_test\SwiftMailerDrupalStateLogger;
-use Drupal\Tests\BrowserTestBase;
 
 /**
  * @group swiftmailer
  */
-class SwiftMailerAlterTest extends BrowserTestBase {
-
-  /**
-   * {@inheritdoc}
-   */
-  protected $defaultTheme = 'stark';
-
-  public static $modules = ['swiftmailer_test', 'swiftmailer', 'mailsystem'];
-
-  /**
-   * @var \Drupal\swiftmailer_test\SwiftMailerDrupalStateLogger
-   */
-  protected $logger = NULL;
+class SwiftMailerAlterTest extends SwiftMailerTestBase {
 
   protected function setUp() {
     parent::setUp();
@@ -167,6 +154,5 @@ class SwiftMailerAlterTest extends BrowserTestBase {
     $this->assertContains('<strong>Hello World</strong>', (string) $message['body']);
     $this->assertContains('Original Plain Text Version', $message['plain']);
   }
-
 
 }
