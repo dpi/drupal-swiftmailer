@@ -57,4 +57,26 @@ abstract class SwiftMailerTestBase extends BrowserTestBase {
     $this->assertContains($value, (string) $email['body']);
   }
 
+  /**
+   * Checks the subject of the most recently sent email.
+   *
+   * @param string $value
+   *   Text to check for.
+   */
+  protected function assertSubject($value) {
+    $captured_emails = $this->container->get('state')->get('system.test_mail_collector') ?: [];
+    $email = end($captured_emails);
+    $this->assertEquals($value, (string) $email['subject']);
+  }
+
+  /**
+   * Enables HTML mails.
+   */
+  protected function enableHtml() {
+    $this->config('swiftmailer.message')
+      ->set('format', SWIFTMAILER_FORMAT_HTML)
+      ->set('respect_format', FALSE)
+      ->save();
+  }
+
 }
