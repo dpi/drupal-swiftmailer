@@ -402,13 +402,8 @@ class SwiftMailer implements MailInterface, ContainerFactoryPluginInterface {
           continue;
         }
 
-        // Get file data.
-        if (UrlHelper::isValid($file->uri, TRUE)) {
-          $content = file_get_contents($file->uri);
-        }
-        else {
-          $content = file_get_contents(\Drupal::service('file_system')->realpath($file->uri));
-        }
+        // Get file data from local file, stream, or remote (e.g. http(s)) uri.
+        $content = file_get_contents($file->uri);
 
         $filename = $file->filename;
         $filemime = $file->filemime;
