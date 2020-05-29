@@ -70,12 +70,11 @@ abstract class SwiftMailerTestBase extends BrowserTestBase {
   }
 
   /**
-   * Enables HTML mails.
+   * Enables Plain text emails.
    */
-  protected function enableHtml() {
+  protected function enablePlain() {
     $this->config('swiftmailer.message')
-      ->set('format', SWIFTMAILER_FORMAT_HTML)
-      ->set('respect_format', FALSE)
+      ->set('content_type', SWIFTMAILER_FORMAT_PLAIN)
       ->save();
   }
 

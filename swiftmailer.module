@@ -11,9 +11,6 @@ use Drupal\Core\Url;
 
 include_once __DIR__ . '/includes/helpers/utilities.inc';
 
-// Define permissions.
-define('SWIFTMAILER_ADMINISTER', 'swiftmailer_administer');
-
 // Define message formats.
 define('SWIFTMAILER_FORMAT_PLAIN', 'text/plain');
 define('SWIFTMAILER_FORMAT_HTML', 'text/html');
@@ -31,13 +28,6 @@ define('SWIFTMAILER_HEADER_MAILBOX', 'mailbox');
 define('SWIFTMAILER_HEADER_DATE', 'date');
 define('SWIFTMAILER_HEADER_ID', 'ID');
 define('SWIFTMAILER_HEADER_PATH', 'path');
-
-// Define system variables defaults.
-define('SWIFTMAILER_VARIABLE_RESPECT_FORMAT_DEFAULT', FALSE);
-define('SWIFTMAILER_VARIABLE_CONVERT_MODE_DEFAULT', FALSE);
-define('SWIFTMAILER_VARIABLE_PATH_DEFAULT', '');
-define('SWIFTMAILER_VARIABLE_FORMAT_DEFAULT', 'text/plain');
-define('SWIFTMAILER_VARIABLE_CHARACTER_SET_DEFAULT', 'UTF-8');
 
 /**
  * Implements hook_mail().

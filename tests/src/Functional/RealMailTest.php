@@ -29,14 +29,14 @@ class RealMailTest extends SwiftMailerTestBase {
     $this->drupalPostForm('user/password', ['name' => $account->getEmail()], 'Submit');
     $this->assertSubject('You forgot ');
     // @todo Should be $this->assertSubject('You forgot <again>');
-    $this->assertBodyContains('#Your password for Rise &amp; shine is a&<b<#');
-    // @todo Should be $this->assertBodyContains('#Your password for Rise & shine is a&<b<#');
-
-    // HTML.
-    $this->enableHtml();
-    $this->drupalPostForm('user/password', ['name' => $account->getEmail()], 'Submit');
     $this->assertBodyContains('#Your password for Rise &amp;amp; shine is a&amp;&lt;b&lt;#');
     // @todo Should be $this->assertBodyContains('#Your password for Rise &amp; shine is a&amp;&lt;b&lt;#');
+
+    // Plain text.
+    $this->enablePlain();
+    $this->drupalPostForm('user/password', ['name' => $account->getEmail()], 'Submit');
+    $this->assertBodyContains('#Your password for Rise &amp; shine is a&<b<#');
+    // @todo Should be $this->assertBodyContains('#Your password for Rise & shine is a&<b<#');
 
     // Account notification message.
     $this->config('user.settings')->set('notify.status_activated', TRUE)->save();
@@ -66,17 +66,18 @@ class RealMailTest extends SwiftMailerTestBase {
       'message[0][value]' => '#I am so happy <grin>#',
     ];
 
-    // Plain text.
+    // HTML.
     $this->drupalPostForm('contact/contact', $edit, 'Send message');
     $this->assertSubject('[Help & Support] Hello & greetings');
+    $this->assertBodyContains('#I am so happy <grin>#');
+    // @todo Should be $this->assertBodyContains('#I am so happy &lt;grin&gt;#');
+
+    // Plain text.
+    $this->enablePlain();
+    $this->drupalPostForm('contact/contact', $edit, 'Send message');
     $this->assertBodyContains('#I am so happy #');
     // @todo Should be $this->assertBodyContains('#I am so happy <grin>#');
 
-    // HTML.
-    $this->enableHtml();
-    $this->drupalPostForm('contact/contact', $edit, 'Send message');
-    $this->assertBodyContains('#I am so happy <grin>#');
-    // @todo Should be $this->assertBodyContains('#I am so happy &lt;grin&gt;#');
   }
 
 }

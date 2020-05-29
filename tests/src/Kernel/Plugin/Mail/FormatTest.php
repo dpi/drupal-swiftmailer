@@ -61,12 +61,12 @@ class FormatTest extends KernelTestBase {
     $message['key'] = 'FormatTest';
     $message['subject'] = 'FormatTest';
 
-    $message['params']['format'] = SWIFTMAILER_FORMAT_HTML;
+    $message['params']['content_type'] = SWIFTMAILER_FORMAT_HTML;
     $actual = $this->plugin->format($message);
     $expected = implode(PHP_EOL, $expected);
     $this->assertSame($expected, $this->extractBody($actual));
 
-    $message['params']['format'] = SWIFTMAILER_FORMAT_PLAIN;
+    $message['params']['content_type'] = SWIFTMAILER_FORMAT_PLAIN;
     $actual = $this->plugin->format($message);
     $expected_plain = implode(PHP_EOL, $expected_plain);
     $this->assertSame($expected_plain, (string) $actual['body']);
@@ -79,7 +79,7 @@ class FormatTest extends KernelTestBase {
     $message['module'] = 'swiftmailer';
     $message['key'] = 'FormatTest';
     $message['subject'] = 'FormatTest';
-    $message['params']['format'] = SWIFTMAILER_FORMAT_HTML;
+    $message['params']['content_type'] = SWIFTMAILER_FORMAT_HTML;
     $message['body'] = [Markup::create('<p class="red">Red text</p>')];
     $expected = '<p class="red" style="color: red;">Red text</p>';
     $actual = $this->plugin->format($message);
