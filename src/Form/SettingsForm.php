@@ -67,7 +67,7 @@ class SettingsForm extends ConfigFormBase {
         SWIFTMAILER_TRANSPORT_SPOOL => $this->t('Spool'),
       ],
       '#default_value' => $transport,
-      '#config' => [
+      '#config_data_store' => [
         'key' => 'swiftmailer.transport:transport',
       ],
       '#ajax' => [
@@ -107,7 +107,7 @@ class SettingsForm extends ConfigFormBase {
       '#description' => $this->t('The hostname or IP address at which the SMTP server can be reached.'),
       '#required' => TRUE,
       '#default_value' => $config->get('smtp_host'),
-      '#config' => [
+      '#config_data_store' => [
         'key' => 'swiftmailer.transport:smtp_host',
       ],
     ];
@@ -117,7 +117,7 @@ class SettingsForm extends ConfigFormBase {
       '#title' => $this->t('Port'),
       '#description' => $this->t('The port at which the SMTP server can be reached (defaults to 25)'),
       '#default_value' => $config->get('smtp_port'),
-      '#config' => [
+      '#config_data_store' => [
         'key' => 'swiftmailer.transport:smtp_port',
       ],
       '#size' => 10,
@@ -129,7 +129,7 @@ class SettingsForm extends ConfigFormBase {
       '#options' => swiftmailer_get_encryption_options(),
       '#description' => $this->t('The type of encryption which should be used (if any)'),
       '#default_value' => $config->get('smtp_encryption'),
-      '#config' => [
+      '#config_data_store' => [
         'key' => 'swiftmailer.transport:smtp_encryption',
       ],
     ];
@@ -147,7 +147,7 @@ class SettingsForm extends ConfigFormBase {
         'method' => 'replace',
         'effect' => 'fade',
       ],
-      '#config' => [
+      '#config_data_store' => [
         'key' => 'swiftmailer.transport:smtp_credential_provider',
       ],
     ];
@@ -173,7 +173,7 @@ class SettingsForm extends ConfigFormBase {
         '#attributes' => [
           'autocomplete' => 'off',
         ],
-        '#config' => [
+        '#config_data_store' => [
           'key' => 'swiftmailer.transport:smtp_credentials.swiftmailer.username',
         ],
       ];
@@ -186,7 +186,7 @@ class SettingsForm extends ConfigFormBase {
         '#attributes' => [
           'autocomplete' => 'off',
         ],
-        '#config' => [
+        '#config_data_store' => [
           'key' => 'swiftmailer.transport:smtp_credentials.swiftmailer.password',
           'secret' => TRUE,
         ],
@@ -207,7 +207,7 @@ class SettingsForm extends ConfigFormBase {
         '#title' => $this->t('Username'),
         '#description' => $this->t('A username required by the SMTP server.'),
         '#default_value' => $config->get('smtp_credentials.key.username'),
-        '#config' => [
+        '#config_data_store' => [
           'key' => 'swiftmailer.transport:smtp_credentials.key.username',
         ],
         '#empty_option' => $this->t('- Please select -'),
@@ -219,7 +219,7 @@ class SettingsForm extends ConfigFormBase {
         '#title' => $this->t('Password'),
         '#description' => $this->t('A password required by the SMTP server.'),
         '#default_value' => $config->get('smtp_credentials.key.password'),
-        '#config' => [
+        '#config_data_store' => [
           'key' => 'swiftmailer.transport:smtp_credentials.key.password',
           'secret' => TRUE,
         ],
@@ -234,7 +234,7 @@ class SettingsForm extends ConfigFormBase {
         '#title' => $this->t('User/password'),
         '#description' => $this->t('A username + password required by the SMTP server.'),
         '#default_value' => $config->get('smtp_credentials.multikey.user_password'),
-        '#config' => [
+        '#config_data_store' => [
           'key' => 'swiftmailer.transport:smtp_credentials.multikey.user_password',
           'secret' => TRUE,
         ],
@@ -268,7 +268,7 @@ class SettingsForm extends ConfigFormBase {
       '#title' => $this->t('MTA path'),
       '#description' => $this->t('The absolute path to the locally installed MTA.'),
       '#default_value' => $config->get('sendmail_path'),
-      '#config' => [
+      '#config_data_store' => [
         'key' => 'swiftmailer.transport:sendmail_path',
       ],
     ];
@@ -279,7 +279,7 @@ class SettingsForm extends ConfigFormBase {
       '#options' => ['bs' => 'bs', 't' => 't '],
       '#description' => $this->t('Not sure which option to choose? Go with <em>bs</em>. You can read more about the above two modes in the @documentation.', ['@documentation' => Link::fromTextAndUrl($this->t('Swift Mailer documentation'), Url::fromUri('https://swiftmailer.symfony.com/docs/sendmail-transport'))->toString()]),
       '#default_value' => $config->get('sendmail_mode'),
-      '#config' => [
+      '#config_data_store' => [
         'key' => 'swiftmailer.transport:sendmail_mode',
       ],
     ];
@@ -305,7 +305,7 @@ class SettingsForm extends ConfigFormBase {
       '#title' => $this->t('Spool directory'),
       '#description' => $this->t('The absolute path to the spool directory.'),
       '#default_value' => !empty($spool_directory) ? $spool_directory : sys_get_temp_dir() . '/swiftmailer-spool',
-      '#config' => [
+      '#config_data_store' => [
         'key' => 'swiftmailer.transport:spool_directory',
       ],
     ];
